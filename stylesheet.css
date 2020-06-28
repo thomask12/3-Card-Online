@@ -1,0 +1,86 @@
+/* Color Theme Swatches in Hex */
+.Better-Odds-Than-Vegas-1-hex { color: #FED26F; }
+.Better-Odds-Than-Vegas-2-hex { color: #FBB03B; }
+.Better-Odds-Than-Vegas-3-hex { color: #F9FAFB; }
+.Better-Odds-Than-Vegas-4-hex { color: #0979BF; }
+.Better-Odds-Than-Vegas-5-hex { color: #ED1C24; }
+
+body{
+  background-color: #FBB03B;
+  color: #F9FAFB;
+  font-size: 30px;
+  padding: 20px;
+}
+
+.top-menu{
+  text-align: center;
+  padding: 5px;
+  margin: 10px;
+}
+.top-menu button{
+  border-width: 0;
+  background-color: #0979BF;
+  color: #F9FAFB;
+}
+
+.start-menu{
+  display: none;
+  text-align: center;
+  padding: 5px;
+  margin: 10px;
+}
+.start-menu button{
+  border-width: 0;
+  background-color: #0979BF;
+  color: #F9FAFB;
+}
+
+img{
+  margin: 5px;
+}
+
+#deck{
+  display: none;
+  text-align: center;
+}
+
+#opponent{
+  display: none;
+  height: 40%;
+  border-style: solid;
+  border-width: 7px;
+  border-radius: 3px;
+  border-color: #FED26F;
+  margin-bottom: 5px;
+  background-color: #000000;
+}
+
+#user{
+  display: none;
+  height: 40%;
+  border-style: solid;
+  border-width: 7px;
+  border-color: #ED1C24;
+  background-color: #000000;
+}
+
+#top, #op1top, #op2top, #op3top{
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  margin: 25px;
+}
+
+#cards{
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  margin: 25px;
+}
+
+#opponent1, #opponent2, #opponent3{
+  display: block;
+  justify-content: center;
+  text-align: center;
+  margin: 20px;
+}

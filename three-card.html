@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Three Card</title>
+    <meta charset="utf-8">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script type="text/javascript" src="three-card.js"></script>
+    <script type="text/javascript" src="display-cards.js"></script>
+    <script type="text/javascript" src="api-cards.js"></script>
+    <link rel="stylesheet" type="text/css" href="stylesheet.css">
+  </head>
+  <body>
+    <div class="top-menu">
+      <form id="game-settings">
+        <label for="players">Select the number of opponents: </label>
+        <select name="players" id="players" required>
+          <option value="one">1</option>
+          <option value="two">2</option>
+          <option value="three">3</option>
+        </select>
+        <button type="submit">Select to begin</button>
+      </form>
+    </div>
+    <div id="opponent">
+    </div>
+    <div id="deck"><img src="images/deck.jpg"></div>
+    <div id="user">
+      <div id="top">
+        <img class="top1" src="images/deck.jpg" alt="deck">
+        <img class="top2" src="images/deck.jpg" alt="deck">
+        <img class="top3" src="images/deck.jpg" alt="deck">
+      </div>
+      <div id="cards">
+      </div>
+    </div>
+    <div class="start-menu">
+      <form id="begin-game">
+        <button type="submit">Begin Game</button>
+      </form>
+    </div>
+  </body>
+
+</html>
