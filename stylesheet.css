@@ -36,6 +36,8 @@ body{
 }
 
 img{
+  width: 75px;
+  height: 105px;
   margin: 5px;
 }
 
