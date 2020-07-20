@@ -10,7 +10,7 @@ $(document).ready(function() {
   //The number of players as selected by the user
   game_started = false;
   var num_players;
-  function newCards(){
+  async function newCards(){
     //id is equal to 0 for player
     $("#cards").empty();
     for (var i = 0; i < players[0].hand.length; i += 1){
@@ -77,8 +77,8 @@ $(document).ready(function() {
       var maxcard;
       for (var j = 0; j < players[id].hand.length; j += 1) {
         var thisCard = players[id].hand[j].code;
-        if (ThreeCard.card_value(thisCard) > newmax) {
-          newmax = ThreeCard.card_value(thisCard);
+        if (players[id].card_value(thisCard) > newmax) {
+          newmax = players[id].card_value(thisCard);
           maxcard = thisCard;
         }
       }
@@ -103,81 +103,93 @@ $(document).ready(function() {
       }
     }
   }
+  //
   //computers go in succession immediately following the player
   $("#cards").on("click", ".user_cards", async function() {
-    //var pCards = await APICards.listHand(0).cards;
-    if (players[0].top.length < 3 && game_started === false) {
-      var this_value = $(this).attr("alt");
-      var this_img = $(this).attr("src");
-      $(this).remove();
-      if ($(".top1").attr("alt") === "deck") {
-        $(".top1").attr("alt", this_value);
-        $(".top1").attr("src", this_img);
-        players[0].top.push("A");
-        await APICards.discard(0, "0top", this_value);
-      } else if ($(".top2").attr("alt") === "deck") {
-        $(".top2").attr("alt", this_value);
-        $(".top2").attr("src", this_img);
-        players[0].top.push("A");
-        await APICards.discard(0, "0top", this_value);
-      } else if ($(".top3").attr("alt") === "deck") {
-        $(".top3").attr("alt", this_value);
-        $(".top3").attr("src", this_img);
-        players[0].top.push("A");
-        await APICards.discard(0, "0top", this_value);
+    var this_value = $(this).attr("alt");
+    var this_img = $(this).attr("src");
+    if (game_started === false){
+      if (players[0].top.length < 3 && game_started === false) {
+        $(this).remove();
+        var new_string = players[0].hand.filter(val => val.code === this_value);
+        var new_hand = players[0].hand.filter(val => val.code !== this_value);
+        players[0].top.push(new_string);
+        players[0].hand = new_hand;
+        if ($(".top1").attr("alt") === "deck") {
+          $(".top1").attr("alt", this_value);
+          $(".top1").attr("src", this_img);
+        } else if ($(".top2").attr("alt") === "deck") {
+          $(".top2").attr("alt", this_value);
+          $(".top2").attr("src", this_img);
+        } else if ($(".top3").attr("alt") === "deck") {
+          $(".top3").attr("alt", this_value);
+          $(".top3").attr("src", this_img);
+        } await APICards.discard(0, "0top", this_value);
+      }
+      if (players[0].top.length === 3){
+        $(".start-menu").css("display", "block");
+        //players[0].top = APICards.listHand(0);
       }
     }
-    if (players[0].top.length === 3){
-      $(".start-menu").css("display", "block");
-      //players[0].top = APICards.listHand(0);
-    }
-  });
-  //Removes card from top if there is one already selected
-  $("#top").on("click", ".top1", function() {
-    selectTops(this);
-  });
-  //Removes card from top if there is one already selected
-  $("#top").on("click", ".top2", function() {
-    selectTops(this);
-  });
-  //Removes card from top if there is one already selected
-  $("#top").on("click", ".top3", function() {
-    selectTops(this);
-  });
-  $("#begin-game").submit(async function(e) {
-    e.preventDefault();
-    $("#begin-game").css("display", "none");
-    displayTops(num_players);
-    //players[i].top = await APICards.listHand(i + "top");
-    game_started = true;
-  });
-  $("#cards").on("click", ".user_cards", async function(){
-    if (game_started === true){
-      for (var i = 0; i < players.length; i += 1){
-        players[i].hand = await APICards.listHand(i);
-      }
-      var this_value = $(this).attr("alt");
-      var lowest_value = players[0].lowestPlayable();
-      if(lowest_value === -1){
+    //
+    //Game has started there
+    //
+    else{
+      //this_value is card code
+      players[0].lowestPlayable();
+      //Picks up if lowest playable is -1
+      if((players[0].lp) === -1){
         players[0].pick();
-        $(this).attr("src", "images/deck.jpg");
-        $(this).attr("alt", "deck")
+        $("#deck").empty();
+        $("#deck").append("<img src='images/deck.jpg' alt='deck'>");
+        return false;
       }
-      else if (ThreeCard.card_value(this_value) >= ThreeCard.card_value(lowest_value)){
-        players[0].put(this_value);
-        $(this).attr("src", players[])
+      //Puts card down and draws if it is greater than the lowest playable
+      else if (players[0].card_value(this_value) >= players[0].card_value(players[0].lp.code)){
+        //this_value is a code value
+        await players[0].put(this_value);
+        $("#deck").append("<img src='" + this_img + "' alt='" + this_value + "'>")
+        await players[0].draw();
+      }
+      //Makes player select again if they picked a card too low
+      else{
+        alert("Select a different card.");
+        return false;
       }
       newCards();
-      for (var i = 1; i < players.length; i += 1){
-        var lowest_playable = players[i].lowestPlayable();
-        if (lowest_playable === -1){
+      for(var i = 1; i < players.length; i += 1){
+        players[i].lowestPlayable();
+        //alert("Lowest playable " + players[i].lp);
+        if(players[i].lp === -1){
           players[i].pick();
+          $("#deck").empty();
+          $("#deck").append("<img src='images/deck.jpg' alt='deck'>");
         }
         else{
-          players[i].put(lowest_playable);
+          players[i].put(players[i].lp.code);
+          $("#deck").append("<img src='" + players[i].lp.image + "' alt='" + players[i].lp.code + "'>")
         }
       }
       return false;
     }
+  });
+  //
+  //Removes card from top if there is one already selected
+  $("#top").on("click", ".top1", function() {
+    selectTops(this);
+  });
+  $("#top").on("click", ".top2", function() {
+    selectTops(this);
+  });
+  $("#top").on("click", ".top3", function() {
+    selectTops(this);
+  });
+  //
+  //Begins game when button is pushed
+  $("#begin-game").submit(async function(e) {
+    e.preventDefault();
+    $("#begin-game").css("display", "none");
+    displayTops(num_players);
+    game_started = true;
   });
 });

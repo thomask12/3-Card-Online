@@ -12,11 +12,17 @@ var APICards = (function() {
   pub.draw = async function(id, num) {
     let response = await fetch("https://deckofcardsapi.com/api/deck/" + JSON.parse(deckId) + "/draw/?count=" + num);
     let drawnCard = await response.json();
+    let card_string = "";
     for(var i = 0; i < drawnCard.cards.length; i += 1){
-        await APICards.toHand(id, drawnCard.cards[i].code);
+      if(i === (drawnCard.cards.length -1)){
+        card_string = card_string.concat(drawnCard.cards[i].code);
+      } else{
+        card_string = card_string.concat(drawnCard.cards[i].code + ",");
+      }
     }
-    deck = JSON.stringify(drawnCard.remaining);
-    return drawnCard;
+    await APICards.toHand(id, card_string);
+    deck = drawnCard.remaining;
+    return drawnCard.cards;
   }
   //Id is pile name
   pub.toHand = async function(id, card) {
@@ -36,8 +42,9 @@ var APICards = (function() {
     let response = await fetch("https://deckofcardsapi.com/api/deck/" + JSON.parse(deckId) + "/pile/" + id + "/draw/?cards=" + card);
     let discarded = await response.json();
     await APICards.toHand(newHand, card);
-    console.log(JSON.stringify(newHand));
-    return discarded;
+    console.log(JSON.stringify(newHand) + " " + JSON.stringify(discarded.cards));
+    //Returns value to be put in the hand
+    return discarded.cards[0];
   }
   return pub;
 })();
