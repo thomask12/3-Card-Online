@@ -8,36 +8,36 @@ var ThreeCard = (function() {
     // Id = 0 is the player, every other one is the computer
     this.id = id;
     //Keeps track of players hands
-    //Hands contain card objects
     this.hand = [];
     this.top = [];
     this.bottom = [];
-    this.lp;
-    //Returns lowest playable card object
+    this.low;
+    //Makes strings for APICards
+    //Finds the lowest card in a players hand
+    this.lowestCard = function(){
+      var lowest = 100;
+      var lowest_card;
+      for (var i = 0; i < this.hand.length; i += 1) {
+        if (this.card_value(this.hand[i].code) < lowest) {
+          lowest = this.card_value(this.hand[i].code);
+          lowest_card = this.hand[i];
+        }
+      }
+      return lowest_card;
+    }
+    //Returns lowest *playable* card object
     this.lowestPlayable = async function() {
       var exPile = disc[disc.length - 1];
-      if (exPile === -1) {
-        var lowest = 100;
-        var lowest_card;
-        for (var i = 0; i < this.hand.length; i += 1) {
-          if (this.card_value(this.hand[i].code) < lowest) {
-            lowest = this.card_value(this.hand[i].code);
-            lowest_card = this.hand[i];
-          }
-        }
-        this.lp = lowest_card;
-        //return lowest_card;
+      if (exPile === -1 || this.card_value(exPile.code) === 15) {
+        this.low = this.lowestCard();
       } else {
         var new_lowest = "N";
-        //alert("exPile: " + this.card_value(exPile.code));
         var nlowest;
         for (var i = 0; i < this.hand.length; i += 1) {
-          //alert("player card: " + this.card_value(this.hand[i].code));
           if (this.card_value(this.hand[i].code) === this.card_value(exPile.code)) {
-            //returns entire card object
-            this.lp = this.hand[i];
+            //adds entire card object
+            this.low = this.hand[i];
             return false;
-            //return this.hand[i];
           }
           else if (this.card_value(this.hand[i].code) > this.card_value(exPile.code)) {
             if(this.card_value(this.hand[i].code) <= this.card_value(new_lowest)){
@@ -47,14 +47,9 @@ var ThreeCard = (function() {
           }
         }
         if (new_lowest === "N") {
-          alert("inside pick");
-          this.lp = -1;
-          //return -1;
+          this.low = -1;
         } else {
-          alert("inside lowest");
-          alert(JSON.stringify(nlowest));
-          this.lp = nlowest;
-          //return lowest;
+          this.low = nlowest;
         }
       }
     }
@@ -74,14 +69,16 @@ var ThreeCard = (function() {
         if (this.top.length > 0) {
           this.hand = this.top;
           var card_string = "";
-          for (var i = 0; i < 3; i += 1) {
-            if (i === 2) {
-              card_string.concat(this.hand[i].code);
+          for (var i = 0; i < top.length; i += 1) {
+            if (i === (top.length -1)) {
+              card_string += this.hand[i].code;
             } else {
-              card_string.concat(this.hand[i].code + ",");
+              card_string += this.hand[i].code + ",";
             }
           }
-          await APICards.toHand(this.id, card_string);
+          alert("New Hand: " + JSON.stringify(this.hand));
+          await APICards.discard(this.id + "top", this.id, card_string);
+          this.top = [];
         } else if (deck === 0 && this.bottom.length !== 0) {
           //Add bottom cards to players hand one-by-one here
         } else {
@@ -90,31 +87,32 @@ var ThreeCard = (function() {
       }
     }
     this.put = async function(card) {
+      //if 2 or a 10 return false, else return true;
       //card is only a cards code
-      //Consider putting amount of cards being put down
-      //alert("Card " + JSON.stringify(card));
+      //var multiple_cards = this.hand.filter(val => val.code === card);
+      //if (multiple_cards.length > )
       disc.push(await APICards.discard(this.id, "stack", card));
-      //alert(JSON.stringify(disc));
       this.hand = this.hand.filter(val => val.code !== card);
-      //this.draw();
+      await this.draw();
     }
     this.pick = async function() {
       var card_string = "";
       for (var i = 1; i < disc.length; i += 1) {
         if (i === disc.length - 1) {
-          alert("Pick " + JSON.stringify(disc[i].code));
+          //alert("Pick " + JSON.stringify(disc[i].code));
           card_string += disc[i].code;
         } else {
           card_string += disc[i].code + ',';
         }
         this.hand.push(disc[i]);
       }
-      //alert(card_string);
       await APICards.discard("stack", this.id, card_string);
       disc = [];
       disc.push(-1);
+      //$("#deck").empty();
+      //$("#deck").append("<img src='images/deck.jpg' alt='deck'>");
     }
-    //takes card codes
+    //Takes card codes
     this.card_value = function(card) {
       var new_card = String(card);
       new_card = new_card.substring(0, 1);
@@ -152,13 +150,10 @@ var ThreeCard = (function() {
       players.push(new player(i));
       //Adds 3 cards to the face down hand
       players[i].bottom = await APICards.draw(players[i].id + "bottom", 3);
-      //await APICards.listHand(players[i].id + "bottom");
       //Puts the card values into the player's hand
       players[i].hand = await APICards.draw(players[i].id, 6);
-      //players[i].hand = await APICards.listHand(players[i].id);
     }
   }
-  //Takes card codes
   return pub;
 })();
 $(document).ready(ThreeCard);

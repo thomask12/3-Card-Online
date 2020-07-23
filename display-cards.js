@@ -1,7 +1,7 @@
-var DisplayCards = (function(){
+var DisplayCards = (function() {
   pub = {};
 
-  pub.player_put = async function(event){
+  pub.player_put = async function(event) {
 
   }
   return pub;
@@ -10,10 +10,10 @@ $(document).ready(function() {
   //The number of players as selected by the user
   game_started = false;
   var num_players;
-  async function newCards(){
+  async function newCards() {
     //id is equal to 0 for player
     $("#cards").empty();
-    for (var i = 0; i < players[0].hand.length; i += 1){
+    for (var i = 0; i < players[0].hand.length; i += 1) {
       $("#cards").append("<img class='user_cards' src='" + players[0].hand[i].image + "' alt='" + players[0].hand[i].code + "'>");
     }
   }
@@ -72,7 +72,7 @@ $(document).ready(function() {
   }
   //Computes the top cards for computer players
   async function findTops(id) {
-    for (var i = 0; i < 3; i += 1){
+    for (var i = 0; i < 3; i += 1) {
       var newmax = -1;
       var maxcard;
       for (var j = 0; j < players[id].hand.length; j += 1) {
@@ -103,12 +103,42 @@ $(document).ready(function() {
       }
     }
   }
+
+  function pickup(id){
+    players[id].pick();
+    $("#deck").empty();
+    $("#deck").append("<img src='images/deck.jpg' alt='deck'>");
+  }
+
+  async function comp_play(id) {
+    await players[id].lowestPlayable();
+    if (players[id].low === -1) {
+      alert("OH NO!");
+      pickup(id);
+    } else if (players[id].card_value(players[id].low.code) === 15) {
+      alert("Naaah");
+      await players[id].put(players[id].low.code);
+      $("#deck").append("<img src='" + players[id].low.image + "' alt='" + players[id].low.code + "'>");
+      await comp_play(id);
+    } else if (players[id].card_value(players[id].low.code) === 16) {
+      alert("Kerchoo");
+      await players[id].put(players[id].low.code);
+      $("#deck").empty();
+      $("#deck").append("<img src='images/deck.jpg' alt='deck'>");
+      disc = [];
+      disc.push(-1);
+      await comp_play(id);
+    } else {
+      players[id].put(players[id].low.code);
+      $("#deck").append("<img src='" + players[id].low.image + "' alt='" + players[id].low.code + "'>");
+    }
+  }
   //
   //computers go in succession immediately following the player
   $("#cards").on("click", ".user_cards", async function() {
     var this_value = $(this).attr("alt");
     var this_img = $(this).attr("src");
-    if (game_started === false){
+    if (game_started === false) {
       if (players[0].top.length < 3 && game_started === false) {
         $(this).remove();
         var new_string = players[0].hand.filter(val => val.code === this_value);
@@ -124,51 +154,77 @@ $(document).ready(function() {
         } else if ($(".top3").attr("alt") === "deck") {
           $(".top3").attr("alt", this_value);
           $(".top3").attr("src", this_img);
-        } await APICards.discard(0, "0top", this_value);
+        }
+        await APICards.discard(0, "0top", this_value);
       }
-      if (players[0].top.length === 3){
+      if (players[0].top.length === 3) {
         $(".start-menu").css("display", "block");
-        //players[0].top = APICards.listHand(0);
       }
     }
-    //
-    //Game has started there
-    //
-    else{
+    //Game starts
+    else {
       //this_value is card code
       players[0].lowestPlayable();
       //Picks up if lowest playable is -1
-      if((players[0].lp) === -1){
-        players[0].pick();
+      if ((players[0].low) === -1) {
+        pickup(0);
+        newCards();
+      } else if (players[0].card_value(this_value) === 15) {
+        await players[0].put(this_value);
+        $("#deck").append("<img src='" + this_img + "' alt='" + this_value + "'>");
+        //await players[0].draw();
+        alert("Reverse reverse. Select another card.");
+        newCards();
+        return false;
+      } else if (players[0].card_value(this_value) === 16) {
+        await players[0].put(this_value);
+        var card_string = "";
+        for (var i = 1; i < disc.length; i += 1) {
+          if (i === (disc.length - 1)) {
+            card_string += disc[i].code;
+          } else {
+            card_string += (disc[i].code + ",");
+          }
+        }
+        disc = [];
+        disc.push(-1);
+        await APICards.discard("stack", "garbage", card_string);
         $("#deck").empty();
         $("#deck").append("<img src='images/deck.jpg' alt='deck'>");
+        //await players[0].draw();
+        alert("Kerchoo! Select another card.");
+        newCards();
         return false;
       }
       //Puts card down and draws if it is greater than the lowest playable
-      else if (players[0].card_value(this_value) >= players[0].card_value(players[0].lp.code)){
+      else if (players[0].card_value(this_value) >= players[0].card_value(players[0].low.code)) {
         //this_value is a code value
         await players[0].put(this_value);
-        $("#deck").append("<img src='" + this_img + "' alt='" + this_value + "'>")
-        await players[0].draw();
+        $("#deck").append("<img src='" + this_img + "' alt='" + this_value + "'>");
+        newCards();
       }
       //Makes player select again if they picked a card too low
-      else{
+      else {
         alert("Select a different card.");
         return false;
       }
-      newCards();
-      for(var i = 1; i < players.length; i += 1){
+      for (var i = 1; i < players.length; i += 1) {
+        comp_play(i);
+        /*
         players[i].lowestPlayable();
-        //alert("Lowest playable " + players[i].lp);
-        if(players[i].lp === -1){
+        //alert("Lowest playable " + players[i].low);
+        if (players[i].low === -1) {
           players[i].pick();
           $("#deck").empty();
           $("#deck").append("<img src='images/deck.jpg' alt='deck'>");
+        } else if (players[i].card_value(players[i].low.code) === 15) {
+          players[i].put(players[i].low.code);
+        } else {
+          players[i].put(players[i].low.code);
+          $("#deck").append("<img src='" + players[i].low.image + "' alt='" + players[i].low.code + "'>");
+          await players[i].draw();
         }
-        else{
-          players[i].put(players[i].lp.code);
-          $("#deck").append("<img src='" + players[i].lp.image + "' alt='" + players[i].lp.code + "'>")
-        }
+        */
       }
       return false;
     }

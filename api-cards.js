@@ -22,6 +22,7 @@ var APICards = (function() {
     }
     await APICards.toHand(id, card_string);
     deck = drawnCard.remaining;
+    console.log(deck);
     return drawnCard.cards;
   }
   //Id is pile name
@@ -34,7 +35,7 @@ var APICards = (function() {
     let response = await fetch("https://deckofcardsapi.com/api/deck/" + JSON.parse(deckId) + "/pile/" + id + "/list/");
     let handList = await response.json();
     //Returns players cards
-    console.log(JSON.stringify(handList));
+    //console.log(JSON.stringify(handList));
     return handList.piles[id].cards;
   }
   //show moving from pile to pile
@@ -42,7 +43,7 @@ var APICards = (function() {
     let response = await fetch("https://deckofcardsapi.com/api/deck/" + JSON.parse(deckId) + "/pile/" + id + "/draw/?cards=" + card);
     let discarded = await response.json();
     await APICards.toHand(newHand, card);
-    console.log(JSON.stringify(newHand) + " " + JSON.stringify(discarded.cards));
+    //console.log("Discarded " + JSON.stringify(discarded));
     //Returns value to be put in the hand
     return discarded.cards[0];
   }
