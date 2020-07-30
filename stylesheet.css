@@ -86,3 +86,13 @@ img{
   text-align: center;
   margin: 20px;
 }
+
+#cards img{
+  -webkit-transition: -webkit-transform 0.2s;
+  transition: transform 0.2s;
+}
+
+#cards img:hover {
+  -webkit-transform: scale(1.2);
+  transform: scale(1.2);
+}

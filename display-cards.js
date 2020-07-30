@@ -1,20 +1,15 @@
-var DisplayCards = (function() {
-  pub = {};
 
-  pub.player_put = async function(event) {
-
-  }
-  return pub;
-})
 $(document).ready(function() {
   //The number of players as selected by the user
   game_started = false;
   var num_players;
+  var play_more = false;
   async function newCards() {
     //id is equal to 0 for player
-    $("#cards").empty();
-    for (var i = 0; i < players[0].hand.length; i += 1) {
-      $("#cards").append("<img class='user_cards' src='" + players[0].hand[i].image + "' alt='" + players[0].hand[i].code + "'>");
+    //broken: empties and doesn't display a player's undercard
+      $("#cards").empty();
+      for (var i = 0; i < players[0].hand.length; i += 1) {
+        $("#cards").append("<img class='user_cards' src='" + players[0].hand[i].image + "' alt='" + players[0].hand[i].code + "'>");
     }
   }
   //The game begins
@@ -50,14 +45,14 @@ $(document).ready(function() {
     });
   });
   //Displays computer players and their initial face down cards
-  function displayOpponents(n) {
+  async function displayOpponents(n) {
     for (var i = 1; i <= n; i += 1) {
       $("#opponent").append("<div id='opponent" + i + "'><h4>Opponent " + i + "</h4>" +
         "<div id='op" + i + "top'><img class='op" + i + "top1' src='images/deck.jpg' alt='deck'>" +
         "<img class='op" + i + "top2' src='images/deck.jpg' alt='deck'>" +
         "<img class='op" + i + "top3' src='images/deck.jpg' alt='deck'>" +
         "</div></div>");
-      findTops(i);
+      await findTops(i);
     }
   }
   //Displays computer player's top cards
@@ -104,33 +99,137 @@ $(document).ready(function() {
     }
   }
 
-  function pickup(id){
-    players[id].pick();
+  async function pickup(id){
+    await players[id].pick();
     $("#deck").empty();
     $("#deck").append("<img src='images/deck.jpg' alt='deck'>");
   }
 
+  async function user_play(card, imag){
+    //if user_play returns -1 return false and break the loop
+    await players[0].lowestPlayable();
+    var multi_card = players[0].hand.filter(val => players[0].card_value(val.code) === players[0].card_value(card));
+    //alert("Multicard length: " + multi_card.length);
+    //Picks up if lowest playable is -1
+    if ((players[0].low) === -1) {
+      await pickup(0);
+      newCards();
+    }
+    //Puts card down and draws if it is greater than the lowest playable
+    else if (players[0].card_value(card) >= players[0].card_value(players[0].low[0].code)){
+      //alert("Lowest player value: " + players[0].low[0].code);
+      if (play_more){
+        if (players[0].card_value(card) !== players[0].card_value(players[0].low[0].code)){
+          alert("Please select a card of the same value");
+          return -1;
+        }
+        else{
+          await players[0].put(card);
+          //await players[0].draw();
+          play_more = false;
+          if (multi_card.length === 1){
+            $("#deck").append("<img src='" + imag + "' alt='" + card + "'>");
+            await players[0].draw();
+            newCards();
+            return 0;
+          }
+        }
+      }
+      else if (players[0].card_value(card) === 15) {
+        await players[0].put(card);
+        await players[0].draw();
+        $("#deck").append("<img src='" + imag + "' alt='" + card + "'>");
+        //await players[0].draw();
+        alert("Reverse reverse. Select another card.");
+        newCards();
+        return -1;
+      } else if (players[0].card_value(card) === 16) {
+        await players[0].put(card);
+        await players[0].draw();
+        var card_string = "";
+        for (var i = 1; i < disc.length; i += 1) {
+          if (i === (disc.length - 1)) {
+            card_string += disc[i].code;
+          } else {
+            card_string += (disc[i].code + ",");
+          }
+        }
+        disc = [];
+        disc.push(-1);
+        await APICards.discard("stack", "garbage", card_string);
+        $("#deck").empty();
+        $("#deck").append("<img src='images/deck.jpg' alt='deck'>");
+        //await players[0].draw();
+        alert("Kerchoo! Select another card.");
+        newCards();
+        return -1;
+      }
+      //await players[0].draw();
+      if (multi_card.length > 1 && players[0].bottom.length > 0){
+        alert("Remaining: " + multi_card.length);
+        var res = prompt("Would you like to play another " + card.substring(0, 1) + "? (Y or N)");
+        switch (res.toLowerCase()){
+          case "y":
+            //alert("Play another " + card.substring(0, 1));
+            play_more = true;
+            await players[0].put(card);
+            $("#deck").append("<img src='" + imag + "' alt='" + card + "'>");
+            newCards();
+            return -1;
+            break;
+          case "n":
+            await players[0].put(card);
+            await players[0].draw();
+            $("#deck").append("<img src='" + imag + "' alt='" + card + "'>");
+            newCards();
+            break;
+          default:
+            alert("Please answer Y or N...");
+            return -1;
+            break;
+        }
+      }
+      else{
+        await players[0].put(card);
+        await players[0].draw();
+        $("#deck").append("<img src='" + imag + "' alt='" + card + "'>");
+        newCards();
+      }
+      //alert("Player low: " + JSON.stringify(players[0].low));
+      //newCards();
+    }
+    //Makes player select again if they picked a card too low
+    else {
+      alert("Select a different card.");
+      return -1;
+    }
+  }
   async function comp_play(id) {
     await players[id].lowestPlayable();
     if (players[id].low === -1) {
       alert("OH NO!");
-      pickup(id);
-    } else if (players[id].card_value(players[id].low.code) === 15) {
+      await pickup(id);
+    } else if (players[id].card_value(players[id].low[0].code) === 15) {
       alert("Naaah");
-      await players[id].put(players[id].low.code);
-      $("#deck").append("<img src='" + players[id].low.image + "' alt='" + players[id].low.code + "'>");
+      await players[id].put(players[id].low[0].code);
+      $("#deck").append("<img src='" + players[id].low[0].image + "' alt='" + players[id].low[0].code + "'>");
+      await players[id].draw();
       await comp_play(id);
-    } else if (players[id].card_value(players[id].low.code) === 16) {
+    } else if (players[id].card_value(players[id].low[0].code) === 16) {
       alert("Kerchoo");
-      await players[id].put(players[id].low.code);
+      await players[id].put(players[id].low[0].code);
       $("#deck").empty();
       $("#deck").append("<img src='images/deck.jpg' alt='deck'>");
       disc = [];
       disc.push(-1);
+      await players[id].draw();
       await comp_play(id);
     } else {
-      players[id].put(players[id].low.code);
-      $("#deck").append("<img src='" + players[id].low.image + "' alt='" + players[id].low.code + "'>");
+      for(var i = 0; i < players[id].low.length; i += 1){
+        await players[id].put(players[id].low[i].code);
+        $("#deck").append("<img src='" + players[id].low[i].image + "' alt='" + players[id].low[i].code + "'>");
+      }
+      await players[id].draw();
     }
   }
   //
@@ -143,7 +242,7 @@ $(document).ready(function() {
         $(this).remove();
         var new_string = players[0].hand.filter(val => val.code === this_value);
         var new_hand = players[0].hand.filter(val => val.code !== this_value);
-        players[0].top.push(new_string);
+        players[0].top.push(new_string[0]);
         players[0].hand = new_hand;
         if ($(".top1").attr("alt") === "deck") {
           $(".top1").attr("alt", this_value);
@@ -164,72 +263,25 @@ $(document).ready(function() {
     //Game starts
     else {
       //this_value is card code
-      players[0].lowestPlayable();
-      //Picks up if lowest playable is -1
-      if ((players[0].low) === -1) {
-        pickup(0);
-        newCards();
-      } else if (players[0].card_value(this_value) === 15) {
-        await players[0].put(this_value);
-        $("#deck").append("<img src='" + this_img + "' alt='" + this_value + "'>");
-        //await players[0].draw();
-        alert("Reverse reverse. Select another card.");
-        newCards();
-        return false;
-      } else if (players[0].card_value(this_value) === 16) {
-        await players[0].put(this_value);
-        var card_string = "";
-        for (var i = 1; i < disc.length; i += 1) {
-          if (i === (disc.length - 1)) {
-            card_string += disc[i].code;
-          } else {
-            card_string += (disc[i].code + ",");
-          }
-        }
-        disc = [];
-        disc.push(-1);
-        await APICards.discard("stack", "garbage", card_string);
-        $("#deck").empty();
-        $("#deck").append("<img src='images/deck.jpg' alt='deck'>");
-        //await players[0].draw();
-        alert("Kerchoo! Select another card.");
-        newCards();
-        return false;
+      //players[...].low should have EVERY cards with the same value as the lowest card
+      //Need to figure out displaying cards if there's a botto card in a player's hand
+      var user_result
+      if(this_value === "unknown"){
+        user_result = await user_play(players[0].hand[0].code, players[0].hand[0].image);
       }
-      //Puts card down and draws if it is greater than the lowest playable
-      else if (players[0].card_value(this_value) >= players[0].card_value(players[0].low.code)) {
-        //this_value is a code value
-        await players[0].put(this_value);
-        $("#deck").append("<img src='" + this_img + "' alt='" + this_value + "'>");
-        newCards();
+      else{
+        user_result = await user_play(this_value, this_img);
       }
-      //Makes player select again if they picked a card too low
-      else {
-        alert("Select a different card.");
+
+      if(user_result === -1){
         return false;
       }
       for (var i = 1; i < players.length; i += 1) {
-        comp_play(i);
-        /*
-        players[i].lowestPlayable();
-        //alert("Lowest playable " + players[i].low);
-        if (players[i].low === -1) {
-          players[i].pick();
-          $("#deck").empty();
-          $("#deck").append("<img src='images/deck.jpg' alt='deck'>");
-        } else if (players[i].card_value(players[i].low.code) === 15) {
-          players[i].put(players[i].low.code);
-        } else {
-          players[i].put(players[i].low.code);
-          $("#deck").append("<img src='" + players[i].low.image + "' alt='" + players[i].low.code + "'>");
-          await players[i].draw();
-        }
-        */
+        await comp_play(i);
       }
       return false;
     }
   });
-  //
   //Removes card from top if there is one already selected
   $("#top").on("click", ".top1", function() {
     selectTops(this);
@@ -240,7 +292,6 @@ $(document).ready(function() {
   $("#top").on("click", ".top3", function() {
     selectTops(this);
   });
-  //
   //Begins game when button is pushed
   $("#begin-game").submit(async function(e) {
     e.preventDefault();

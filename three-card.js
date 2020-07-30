@@ -27,16 +27,20 @@ var ThreeCard = (function() {
     }
     //Returns lowest *playable* card object
     this.lowestPlayable = async function() {
+      var lower;
       var exPile = disc[disc.length - 1];
       if (exPile === -1 || this.card_value(exPile.code) === 15) {
-        this.low = this.lowestCard();
+        lower = this.lowestCard();
+        this.low = this.hand.filter(val => this.card_value(val.code) === this.card_value(lower.code));
       } else {
         var new_lowest = "N";
         var nlowest;
         for (var i = 0; i < this.hand.length; i += 1) {
           if (this.card_value(this.hand[i].code) === this.card_value(exPile.code)) {
             //adds entire card object
-            this.low = this.hand[i];
+            lower = this.hand[i];
+            this.low = this.hand.filter(val => this.card_value(val.code) === this.card_value(lower.code));
+            //this.low = this.hand[i];
             return false;
           }
           else if (this.card_value(this.hand[i].code) > this.card_value(exPile.code)) {
@@ -49,38 +53,61 @@ var ThreeCard = (function() {
         if (new_lowest === "N") {
           this.low = -1;
         } else {
-          this.low = nlowest;
+          lower = nlowest;
+          this.low = this.hand.filter(val => this.card_value(val.code) === this.card_value(lower.code));
         }
       }
     }
     this.draw = async function() {
       if (this.hand.length < 3 && deck > 0) {
+        var new_cards;
         if (deck >= 3) {
-          var new_cards = await APICards.draw(this.id, 3 - this.hand.length);
-          this.hand.push(new_cards[0]);
+          //alert("To draw = " + this.hand.length);
+          new_cards = await APICards.draw(this.id, 3 - this.hand.length);
+          //alert(JSON.stringify(new_cards));
+          //this.hand.push(new_cards);
         } else if (deck < (3 - this.hand.length)) {
-          var new_cards = await APICards.draw(this.id, deck);
-          this.hand.push(new_cards[0]);
+          new_cards = await APICards.draw(this.id, deck);
+          //this.hand.push(new_cards);
         } else {
-          var new_cards = await APICards.draw(this.id, (3 - this.hand.length));
-          this.hand.push(new_cards[0]);
+          new_cards = await APICards.draw(this.id, (3 - this.hand.length));
+          //this.hand.push(new_cards);
+        }
+        for(var i = 0; i < new_cards.length; i += 1){
+          this.hand.push(new_cards[i])
         }
       } else if (this.hand.length === 0) {
-        if (this.top.length > 0) {
+        if (this.top.length !== 0) {
           this.hand = this.top;
           var card_string = "";
-          for (var i = 0; i < top.length; i += 1) {
-            if (i === (top.length -1)) {
+          for (var i = 0; i < this.top.length; i += 1) {
+            if (i === (this.top.length -1)) {
               card_string += this.hand[i].code;
             } else {
               card_string += this.hand[i].code + ",";
             }
           }
-          alert("New Hand: " + JSON.stringify(this.hand));
+          //alert("New Hand: " + card_string);
           await APICards.discard(this.id + "top", this.id, card_string);
           this.top = [];
-        } else if (deck === 0 && this.bottom.length !== 0) {
-          //Add bottom cards to players hand one-by-one here
+          $("#top").empty();
+          $("#top").append("<img class='top1' src='images/deck.jpg' alt='deck'>" +
+          "<img class='top2' src='images/deck.jpg' alt='deck'>" +
+          "<img class='top3' src='images/deck.jpg' alt='deck'>");
+        } else if (this.bottom.length !== 0) {
+          $("#top").empty();
+          for (var i = 0; i < this.bottom.length; i += 1){
+            $("#top").append("<img class='unknown" + i + "' src='images/deck.jpg' alt='unknown" + i + "'>");
+          }
+          //$("#cards").append("<img class='bottom1' src='images/deck.jpg' alt='deck'>");
+          //Removes first value of the array
+          this.hand = this.bottom.shift();
+          alert("Underhand card: " + JSON.stringify(this.hand.code));
+          await APICards.discard(this.id + "bottom", this.id, this.hand.code);
+          if(players[0].bottom.length < 3){
+            $("#cards").empty();
+            $("#cards").append("<img class='bottom1' src='images/deck.jpg' alt='unknown'>");
+          }
         } else {
           alert("Player " + this.id + " has won the game.");
         }
@@ -93,7 +120,7 @@ var ThreeCard = (function() {
       //if (multiple_cards.length > )
       disc.push(await APICards.discard(this.id, "stack", card));
       this.hand = this.hand.filter(val => val.code !== card);
-      await this.draw();
+      //await this.draw();
     }
     this.pick = async function() {
       var card_string = "";
