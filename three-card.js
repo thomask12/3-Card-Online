@@ -8,7 +8,7 @@ var draw_deck = ["AS", "2S", "3S", "4S", "5S", "6S", "7S", "8S", "9S", "10S", "J
 ];
 var ThreeCard = (function() {
   var pub = {};
-
+  var play_more = false;
   function shuffle_cards() {
     for (var i = draw_deck.length - 1; i > 0; i = i - 1) {
       const j = Math.floor(Math.random() * i)
@@ -17,7 +17,23 @@ var ThreeCard = (function() {
       draw_deck[j] = temp;
     }
   }
-
+  function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+  function disable_click (card){
+    var not_card;
+    if (ThreeCard.card_value(card) === 15 || ThreeCard.card_value(card) === 16){
+      not_card = players[0].hand.filter(val => val !== card);
+    }
+    else{
+      not_card = players[0].hand.filter(val => ThreeCard.card_value(val) !== ThreeCard.card_value(card));
+    }
+    for(var i = 0; i < not_card; i += 1){
+      $(".user_cards:has(img[alt='" + not_card[i] + "'])").unbind("click");
+      $(".user_cards:has(img[alt='" + not_card[i] + "'])").css("cursor", "");
+      $(".user_cards:has(img[alt='" + not_card[i] + "'])").css("opacity", "0.2");
+    }
+  }
   function player(id) {
     // Id = 0 is the player, every other one is the computer
     this.id = id;
@@ -26,14 +42,15 @@ var ThreeCard = (function() {
     this.top = [];
     this.bottom = [];
     this.low;
+    this.to_play = [];
     //Makes strings for APICards
     //Finds the lowest card in a players hand
     this.lowestCard = function() {
       var lowest = 100;
       var lowest_card;
       for (var i = 0; i < this.hand.length; i += 1) {
-        if (this.card_value(this.hand[i]) < lowest) {
-          lowest = this.card_value(this.hand[i]);
+        if (ThreeCard.card_value(this.hand[i]) < lowest) {
+          lowest = ThreeCard.card_value(this.hand[i]);
           lowest_card = this.hand[i];
         }
       }
@@ -43,19 +60,19 @@ var ThreeCard = (function() {
     this.lowestPlayable = async function() {
       var lower;
       var exPile = disc[disc.length - 1];
-      if (exPile === -1 || this.card_value(exPile) === 15) {
+      if (exPile === -1 || ThreeCard.card_value(exPile) === 15) {
         lower = this.lowestCard();
-        this.low = this.hand.filter(val => this.card_value(val) === this.card_value(lower));
+        this.low = this.hand.filter(val => ThreeCard.card_value(val) === ThreeCard.card_value(lower));
       } else {
         var new_lowest = "N";
         var nlowest;
         for (var i = 0; i < this.hand.length; i += 1) {
-          if (this.card_value(this.hand[i]) === this.card_value(exPile)) {
+          if (ThreeCard.card_value(this.hand[i]) === ThreeCard.card_value(exPile)) {
             lower = this.hand[i];
-            this.low = this.hand.filter(val => this.card_value(val) === this.card_value(lower));
+            this.low = this.hand.filter(val => ThreeCard.card_value(val) === ThreeCard.card_value(lower));
             return false;
-          } else if (this.card_value(this.hand[i]) > this.card_value(exPile)) {
-            if (this.card_value(this.hand[i]) <= this.card_value(new_lowest)) {
+          } else if (ThreeCard.card_value(this.hand[i]) > ThreeCard.card_value(exPile)) {
+            if (ThreeCard.card_value(this.hand[i]) <= ThreeCard.card_value(new_lowest)) {
               new_lowest = this.hand[i];
               nlowest = this.hand[i];
             }
@@ -65,7 +82,7 @@ var ThreeCard = (function() {
           this.low = -1;
         } else {
           lower = nlowest;
-          this.low = this.hand.filter(val => this.card_value(val) === this.card_value(lower));
+          this.low = this.hand.filter(val => ThreeCard.card_value(val) === ThreeCard.card_value(lower));
         }
       }
     }
@@ -76,11 +93,10 @@ var ThreeCard = (function() {
           new_cards = 3 - this.hand.length;
         } else if (draw_deck.length < (3 - this.hand.length)) {
           new_cards = draw_deck.length;
-        }
-        else{
+        } else {
           new_cards = 3 - this.hand.length;
         }
-        for(var i = 0; i < new_cards; i += 1){
+        for (var i = 0; i < new_cards; i += 1) {
           var temp_val = draw_deck.pop();
           this.hand.push(temp_val);
         }
@@ -88,12 +104,12 @@ var ThreeCard = (function() {
         if (this.top.length !== 0) {
           this.hand = this.top;
           this.top = [];
-          if(this.id === 0){
+          if (this.id === 0) {
             $("#top").empty();
             $("#top").append("<img class='top1' src='images/deck.svg' alt='deck'>" +
               "<img class='top2' src='images/deck.svg' alt='deck'>" +
               "<img class='top3' src='images/deck.svg' alt='deck'>");
-          } else{
+          } else {
             $("#op" + this.id + "top").empty();
             $("#op" + this.id + "top").append("<img class='op" + i + "top1' src='images/deck.svg' alt='deck'>" +
               "<img class='op" + i + "top2' src='images/deck.svg' alt='deck'>" +
@@ -103,15 +119,14 @@ var ThreeCard = (function() {
           //Removes first value of the array
           var bottom_card = this.bottom.pop();
           this.hand.push(bottom_card);
-          if(this.id === 0){
+          if (this.id === 0) {
             $("#top").empty();
             for (var i = 0; i < this.bottom.length; i += 1) {
               $("#top").append("<img class='unknown" + i + "' src='images/deck.svg' alt='unknown" + i + "'>");
             }
             $("#cards").append("<img class='user_cards' src='images/deck.svg' alt='unknown'>");
             this.hand.push("unknown");
-          }
-          else{
+          } else {
             $("#op" + this.id + "top").empty();
             for (var i = 0; i < this.bottom.length; i += 1) {
               $("#op" + this.id + "top").append("<img class='unknown" + i + "' src='images/deck.svg' alt='unknown" + i + "'>");
@@ -128,6 +143,15 @@ var ThreeCard = (function() {
       this.hand = this.hand.filter(val => val !== card);
       disc.push(card);
       $("#deck").append("<img class='deck_cards' src='images/" + card + ".svg' alt='" + card + "'>");
+      if (ThreeCard.check_back()){
+        garbage.push(disc);
+        disc = [];
+        disc.push(-1);
+        $("#deck").empty();
+        $("#deck").append("<img src='images/deck.svg' alt='deck'>");
+        //alert("Kerchoo! Select another card.");
+        Banners.display_ten();
+      }
     }
     this.pick = async function() {
       for (var i = 1; i < disc.length; i += 1) {
@@ -138,50 +162,209 @@ var ThreeCard = (function() {
       $("#deck").empty();
       $("#deck").append("<img src='images/deck.svg' alt='deck'>");
     }
-    //Takes card codes
-    this.card_value = function(card) {
-      var new_card = String(card);
-      new_card = new_card.substring(0, 1);
-      //Ten (reset/blow-up)
-      if (new_card === "1") {
-        return 16;
+  }
+  pub.card_value = function(card) {
+    var new_card = String(card);
+    new_card = new_card.substring(0, 1);
+    //Ten (reset/blow-up)
+    if (new_card === "1") {
+      return 16;
+    }
+    //Two (reset)
+    if (new_card === "2") {
+      return 15;
+    }
+    //Ace
+    if (new_card === "A") {
+      return 14;
+    } else if (new_card === "K") {
+      return 13;
+    } else if (new_card === "Q") {
+      return 12;
+    } else if (new_card === "J") {
+      return 11;
+    } else if (new_card === "N") {
+      return 100;
+    }
+    //Everything else
+    return new_card;
+  }
+pub.setup = async function(p) {
+  //Initialize disc with lowest value
+  disc.push(-1);
+  shuffle_cards();
+  for (var i = 0; i < p; i += 1) {
+    players.push(new player(i));
+    //Adds 3 cards to the face down hand
+    for (var j = 0; j < 6; j += 1) {
+      if (j < 3) {
+        var temp_val = draw_deck.pop();
+        players[i].bottom.push(temp_val);
       }
-      //Two (reset)
-      if (new_card === "2") {
-        return 15;
-      }
-      //Ace
-      if (new_card === "A") {
-        return 14;
-      } else if (new_card === "K") {
-        return 13;
-      } else if (new_card === "Q") {
-        return 12;
-      } else if (new_card === "J") {
-        return 11;
-      } else if (new_card === "N") {
-        return 100;
-      }
-      //Everything else
-      return new_card;
+      var new_temp = draw_deck.pop();
+      players[i].hand.push(new_temp);
     }
   }
-  pub.setup = async function(p) {
-    //Initialize disc with lowest value
-    disc.push(-1);
-    shuffle_cards();
-    for (var i = 0; i < p; i += 1) {
-      players.push(new player(i));
-      //Adds 3 cards to the face down hand
-      for(var j = 0; j < 6; j += 1){
-        if (j < 3){
-          var temp_val = draw_deck.pop();
-          players[i].bottom.push(temp_val);
+}
+//Computes the top cards for computer players
+pub.findTops = async function(id) {
+  for (var i = 0; i < 3; i += 1) {
+    var newmax = -1;
+    var maxcard;
+    for (var j = 0; j < players[id].hand.length; j += 1) {
+      var thisCard = players[id].hand[j];
+      if (ThreeCard.card_value(thisCard) > newmax) {
+        newmax = ThreeCard.card_value(thisCard);
+        maxcard = thisCard;
+      }
+    }
+    players[id].hand = players[id].hand.filter(val => val !== maxcard);
+    players[id].top.push(maxcard);
+  }
+}
+pub.check_back = function() {
+  var num_cards = 1;
+  var card = disc[disc.length - 1];
+  for (var i = 2; i <= 4; i += 1) {
+    var next_card = disc[disc.length - i];
+    if (ThreeCard.card_value(next_card) !== ThreeCard.card_value(card)) {
+      break;
+    } else {
+      num_cards += 1;
+    }
+  }
+  if (num_cards === 3 && ThreeCard.card_value(card) === "6") {
+    Banners.beast();
+  }
+  if (num_cards === 4) {
+    return true;
+  }
+  return false;
+}
+pub.user_play = async function(card, imag){
+  //if user_play returns -1 return false and break the loop
+  await players[0].lowestPlayable();
+  var multi_card = players[0].hand.filter(val => ThreeCard.card_value(val) === ThreeCard.card_value(card));
+  if ((players[0].low) === -1) {
+    //Alert on screen to pick up cards
+    //user_pickup = true;
+    return 0;
+    //players[0].pick();
+  }
+  //Puts card down and draws if it is greater than the lowest playable
+  else if (ThreeCard.card_value(card) >= ThreeCard.card_value(players[0].low[0])) {
+    /*
+    if (play_more) {
+      if (ThreeCard.card_value(card) !== ThreeCard.card_value(players[0].low[0])) {
+        Banners.display_wrong_multi();
+        return -1;
+      } else {;
+        play_more = false;
+        if (multi_card.length === 1) {
+          //Display button that says "Uh oh. Pick up".
+          await players[0].put(card);
+          await players[0].draw();
+          if(ThreeCard.check_back()){
+            return -1;
+          }
+          return 0;
         }
-        var new_temp = draw_deck.pop();
-        players[i].hand.push(new_temp);
+      }
+      */
+    if (ThreeCard.card_value(card) === 15) {
+      //await
+      players[0].to_play.push(card);
+      disable_click(card);
+      //await
+      return -1;
+    } else if (ThreeCard.card_value(card) === 16) {
+      //await players[0].put(card);
+      players[0].to_play.push(card);
+      disable_click(card);
+      //await players[0].draw();
+      //garbage.push(disc);
+      //disc = [];
+      //disc.push(-1);
+      //$("#deck").empty();
+      //$("#deck").append("<img src='images/deck.svg' alt='deck'>");
+      //await Banners.display_ten();
+      return -1;
+    }
+    if (multi_card.length > 1 && players[0].bottom.length > 0) {
+      //var res = prompt("Would you like to play another " + card.substring(0, 1) + "? (Y or N)");
+      //switch (res.toLowerCase()) {
+        //case "y":
+          //play_more = true;
+          //await players[0].put(card);
+          //newCards();
+          players[0].to_play.push(card);
+          disable_click(card);
+          //card_selected = true;
+          return -1;
+          //break;
+        //case "n":
+          //await players[0].put(card);
+          //await players[0].draw();
+          //newCards();
+          //break;
+        //default:
+          //alert("Please answer Y or N...");
+          //return -1;
+          //break;
+      } else {
+      //await players[0].put(card);
+      //await players[0].draw();
+      //return 0 for play and -1 for play again
+      players[0].to_play.push(card);
+      disable_click(card);
+      return -1;
+      //newCards();
+      if(ThreeCard.check_back()){
+        return -1;
       }
     }
   }
-  return pub;
+  //Makes player select again if they picked a card too low
+  else {
+    Banners.display_wrong_card();
+    return -1;
+  }
+}
+pub.comp_play = async function(id) {
+  await players[id].lowestPlayable();
+  if(disc.length === 1){
+    $("#deck").empty();
+  }
+  if (players[id].low === -1) {
+    Banners.display_pickup(id);
+    players[id].pick();
+  } else if (ThreeCard.card_value(players[id].low[0]) === 15) {
+    await timeout(650);
+    Banners.display_two();
+    await players[id].put(players[id].low[0]);
+    await players[id].draw();
+    await ThreeCard.comp_play(id);
+  } else if (ThreeCard.card_value(players[id].low[0]) === 16) {
+    await timeout(650);
+    await Banners.display_ten();
+    await players[id].put(players[id].low[0]);
+    $("#deck").empty();
+    $("#deck").append("<img src='images/deck.svg' alt='deck'>");
+    disc = [];
+    disc.push(-1);
+    await players[id].draw();
+    await ThreeCard.comp_play(id);
+  } else {
+    await timeout(650);
+    for (var i = 0; i < players[id].low.length; i += 1) {
+      await players[id].put(players[id].low[i]);
+      await timeout(300);
+    }
+    await players[id].draw();
+    if(ThreeCard.check_back()){
+      await ThreeCard.comp_play(id);
+    }
+  }
+}
+return pub;
 })();

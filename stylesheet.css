@@ -48,6 +48,7 @@ img{
   width: 55%;
   justify-content: center;
   margin: auto;
+  margin-bottom: 5px;
 }
 .deck_cards{
   display: flex;
@@ -104,18 +105,33 @@ img{
   justify-content: center;
   align-items: center;
 }
-.user_cards{
+
+
+#card_wrapper{
+  overflow: hidden;
   -webkit-transition: -webkit-transform 0.2s;
   transition: transform 0.2s;
+  cursor: pointer;
 }
-.user_cards:hover {
+#card_wrapper:last-child {
+  overflow: visible;
+}
+
+#card_wrapper:hover{
+  overflow: visible;
   -webkit-transform: scale(1.2);
   transform: scale(1.2);
 }
 
-#card_wrapper{
-  overflow: hidden;
-}
-#card_wrapper:last-child, #card_wrapper:hover{
-  overflow: visible;
+#alerts{
+  position: absolute;
+  text-align: center;
+  width: 48%;
+  top: 45%;
+  padding: 15px;
+  opacity: 0.85;
+  border: 1px solid transparent;
+  color: #0F1026;
+  background-color: #0979BF;
+  border-radius: 2px;
 }
