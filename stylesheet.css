@@ -43,7 +43,7 @@ img{
 }
 
 #deck{
-  display: none;
+
   height: 20%;
   width: 55%;
   justify-content: center;
@@ -64,7 +64,7 @@ img{
 }
 
 #opponent{
-  display: none;
+
   height: 20%;
   width: auto;
   border-style: solid;
@@ -82,7 +82,7 @@ img{
 }
 
 #user{
-  display: none;
+
   position: relative;
   height: 25%;
   width: auto;
