@@ -1,32 +1,36 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Three Card</title>
-    <meta charset="utf-8">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-    <script type="text/javascript" src="banners.js"></script>
-    <script type="text/javascript" src="three-card.js"></script>
-    <script type="text/javascript" src="display-cards.js"></script>
-    <link rel="stylesheet" type="text/css" href="stylesheet.css">
-  </head>
-  <body>
-    <div id="opponent">
+
+<head>
+  <title>Three Card</title>
+  <meta charset="utf-8">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script type="text/javascript" src="banners.js"></script>
+  <script type="text/javascript" src="three-card.js"></script>
+  <script type="text/javascript" src="display-cards.js"></script>
+  <link rel="stylesheet" type="text/css" href="stylesheet.css">
+</head>
+
+<body>
+  <div id="opponent">
+  </div>
+  <div id="alerts"></div>
+  <div id="previous"></div>
+  <div id="deck"><img src="images/deck.svg"></div>
+  <div id="user">
+    <div id="top">
+      <img class="top1" src="images/deck.svg" alt="deck">
+      <img class="top2" src="images/deck.svg" alt="deck">
+      <img class="top3" src="images/deck.svg" alt="deck">
     </div>
-    <div id="alerts"></div>
-    <div id="deck"><img src="images/deck.svg"></div>
-    <div id="user">
-      <div id="top">
-        <img class="top1" src="images/deck.svg" alt="deck">
-        <img class="top2" src="images/deck.svg" alt="deck">
-        <img class="top3" src="images/deck.svg" alt="deck">
-      </div>
-      <div id="cards">
-      </div>
+    <div id="cards">
     </div>
-    <div class="start-menu">
-      <form id="begin-game">
-        <button type="submit">Begin Game</button>
-      </form>
-    </div>
-  </body>
+  </div>
+  <div class="start-menu">
+    <form id="begin-game">
+      <button type="submit">Begin Game</button>
+    </form>
+  </div>
+</body>
+
 </html>

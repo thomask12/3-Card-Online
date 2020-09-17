@@ -14,6 +14,11 @@ $(document).ready(async function() {
       ThreeCard.comp_play(i);
     }
   }
+  function reset_opacity(){
+    for (var i = 0; i < players[0].hand.length; i += 1) {
+      $("img[alt='" + players[0].hand[i] + "']").parent().css("opacity", "1");
+    }
+  }
   async function newCards() {
     $("#cards").empty();
     for (var i = 0; i < players[0].hand.length; i += 1) {
@@ -71,15 +76,9 @@ $(document).ready(async function() {
   }
   //
   //Removes card from top if there is one already selected
-  $("#top").on("click", ".top1", function() {
-    selectTops(this);
-  });
-  $("#top").on("click", ".top2", function() {
-    selectTops(this);
-  });
-  $("#top").on("click", ".top3", function() {
-    selectTops(this);
-  });
+  $("#top").on("click", ".top1", function() { selectTops(this); });
+  $("#top").on("click", ".top2", function() { selectTops(this); });
+  $("#top").on("click", ".top3", function() { selectTops(this); });
   //Begins game when button is pushed
   $("#begin-game").submit(async function(e) {
     e.preventDefault();
@@ -90,27 +89,29 @@ $(document).ready(async function() {
   });
   //Activate after player has selected cards
   $("#deck").on("click", async function() {
+    //Checks if a player needs to pick up cards
     if (user_pickup) {
       user_pickup = false;
       players[0].pick();
       newCards();
     }
+    //Checks is player selected cards before trying to play
     else if (players[0].to_play.length === 0) {
       Banners.display_wrong();
       return false;
     }
     else if (players[0].to_play.length > 0) {
+      //Allows a player to play again after a 2 (reset card)
       if (ThreeCard.card_value(players[0].to_play[0]) === 15) {
         players[0].put(players[0].to_play[0]);
-        players[0].draw();
         Banners.display_two();
         newCards();
         players[0].to_play = [];
         return false;
       }
+      //Allows a player to play again after a 10 (blow up card)
       if (ThreeCard.card_value(players[0].to_play[0]) === 16) {
         players[0].put(players[0].to_play[0]);
-        players[0].draw();
         garbage.push(disc);
         disc = [];
         disc.push(-1);
@@ -121,10 +122,11 @@ $(document).ready(async function() {
         players[0].to_play = [];
         return false;
       }
+      //Plays all (valid) cards a player has selected
       for (var i = 0; i < players[0].to_play.length; i += 1) {
         players[0].put(players[0].to_play[i]);
       }
-      players[0].draw();
+      //Blows up the pile after 4-of-a-kind
       if (four_kind) {
         four_kind = false;
         newCards();
@@ -134,15 +136,6 @@ $(document).ready(async function() {
       newCards();
     }
     computers_play();
-    /*
-    for (var i = 1; i < players.length; i += 1) {
-      if (disc.length === 1) {
-        $("#deck").empty();
-      }
-      await ThreeCard.comp_play(i);
-    }
-    */
-    //players[0].lowestPlayable();
     players[0].to_play = [];
     return false;
   });
@@ -152,6 +145,7 @@ $(document).ready(async function() {
     players[0].lowestPlayable();
     var this_value = $(this).attr("alt");
     var this_img = $(this).attr("src");
+    //Player selects top cards before game begins
     if (game_started === false) {
       if (players[0].top.length < 3) {
         $(this).parent().remove();
@@ -181,6 +175,7 @@ $(document).ready(async function() {
       //if(disc.length === 1){
       //$("#deck").empty();
       //}
+      //Allows user to pick up by clicking their hand
       if(user_pickup){
         players[0].pick();
         user_pickup = false;
@@ -188,31 +183,31 @@ $(document).ready(async function() {
         computers_play();
         return false;
       }
+      //Checks if a player selected a card with a large enough value
       else if (ThreeCard.card_value(this_value) < ThreeCard.card_value(players[0].low) && ThreeCard.card_value(players[0].low) !== 15) {
         Banners.display_wrong_card();
         return false;
       }
       if (players[0].to_play.length > 0) {
+        //Deselects cards if they are clicked again
         if (this_value === players[0].to_play[0] && players[0].to_play.length === 1) {
-          for (var i = 0; i < players[0].hand.length; i += 1) {
-            $("img[alt='" + players[0].hand[i] + "']").parent().css("opacity", "1");
-          }
+          reset_opacity();
           $("img[alt='" + players[0].to_play[0] + "']").parent().css("transform", "translate(0px, 0px)");
           $("img[alt='" + players[0].to_play[0] + "']").parent().css("overflow", "hidden");
           players[0].to_play = [];
           return false;
         }
+        //Deselects cards if a different value is clicked
         if (ThreeCard.card_value(this_value) !== ThreeCard.card_value(players[0].to_play[0]) && players[0].to_play.length !== 0) {
-          for (var i = 0; i < players[0].hand.length; i += 1) {
-            $("img[alt='" + players[0].hand[i] + "']").parent().css("opacity", "1");
-          }
-          for (var j = 0; j < players[0].to_play.length; j += 1) {
-            $("img[alt='" + players[0].to_play[j] + "']").parent().css("transform", "translate(0px, 0px)");
-            $("img[alt='" + players[0].to_play[j] + "']").parent().css("overflow", "hidden");
+          reset_opacity();
+          for (var i = 0; i < players[0].to_play.length; i += 1) {
+            $("img[alt='" + players[0].to_play[i] + "']").parent().css("transform", "translate(0px, 0px)");
+            $("img[alt='" + players[0].to_play[i] + "']").parent().css("overflow", "hidden");
           }
           players[0].to_play = [];
           return false;
         }
+        //Deselects one card if multiple are selected
         for (var i = 0; i < players[0].to_play.length; i += 1) {
           if (this_value === players[0].to_play[i]) {
             var toPlay_card = players[0].hand.filter(val => val === this_value);
@@ -227,6 +222,8 @@ $(document).ready(async function() {
       $(this).parent().css("transform", "translate(0px, -20px)");
       $(this).parent().css("overflow", "visible");
       var user_result;
+      //Add fading border around deck when card is selected
+      //$("#deck").css("border", "2px solid red");
       var not_card = players[0].hand.filter(val => ThreeCard.card_value(val) !== ThreeCard.card_value(this_value));
       for (var i = 0; i < not_card.length; i += 1) {
         $("img[alt='" + not_card[i] + "']").parent().css("opacity", "0.5");

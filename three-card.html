@@ -6,8 +6,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script type="text/javascript" src="game-info.js"></script>
     <link rel="stylesheet" type="text/css" href="stylesheet.css">
+    <link rel="stylesheet" href="https://use.typekit.net/eyx3qru.css">
   </head>
   <body>
+    <header>
+      <h1>Three Card</h1>
+    </header>
     <div class="top-menu">
       <form id="game-settings" method="post">
         <label for="players">Select the number of opponents: </label>
@@ -19,6 +23,49 @@
         <button type="submit">Select to begin</button>
       </form>
     </div>
+    <dl>
+      <dt>
+        <h2>How to Play</h2>
+      </dt>
+      <dt class="subtitle">Card Values:</dt>
+      <dd>
+        <span class="subtitle">Reset Cards:</span> Once a reset card is played, the same player can play another card immediately after.
+        <ul>
+          <li><img src="images/2H.svg" alt="2"> - Resets the value of the last played card. Any value card may be played immediately after.</li>
+          <li><img src="images/10H.svg" alt="10"> - Removes all previous cards from play. Any value card may be played after.</li>
+        </ul>
+      </dd>
+      <dd>
+        <span class="subtitle">Normal Cards:</span> (from lowest value to highest value).
+        <span class="img_order">
+          <img src="images/3H.svg" alt="3">
+          <img src="images/4H.svg" alt="4">
+          <img src="images/5H.svg" alt="5">
+          <img src="images/6H.svg" alt="6">
+          <img src="images/7H.svg" alt="7">
+          <img src="images/8H.svg" alt="8">
+          <img src="images/9H.svg" alt="9">
+          <img src="images/JH.svg" alt="Jack">
+          <img src="images/QH.svg" alt="Queen">
+          <img src="images/KH.svg" alt="King">
+          <img src="images/AH.svg" alt="Ace">
+        </span>
+      </dd>
+      <dt class="subtitle">Rules:</dt>
+      <dd class="game_rules">
+        <ul>
+          <li>To play cards: select a card from your hand, then select the "pile" in the middle of the page.</li>
+          <li>Drawing cards is done automatically after cards have been played.</li>
+        </ul>
+        <ol>
+          <li>The user always begins the game.</li>
+          <li>Players will have 3 or more cards in their hands at all times</li>
+          <li>Players must play a card(s) greater than or equal to the previously played card. *See card values above*</li>
+          <li>If a player does not have cards high enough to play, they must pick up all previously played cards.</li>
+          <li>If a player plays 4 cards of the same value (or plays the 4th and final card on top of the other 3) all previous cards are removed from play and the player plays again.</li>
+        </ol>
+      </dd>
+    </dl>
   </body>
 
 </html>

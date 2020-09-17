@@ -66,7 +66,9 @@ var ThreeCard = (function() {
         }
         if (new_lowest === "N") {
           this.low = -1;
-          user_pickup = true;
+          if(this.id === 0){
+            user_pickup = true;
+          }
         } else {
           lower = nlowest;
           this.low = this.hand.filter(val => ThreeCard.card_value(val) === ThreeCard.card_value(lower));
@@ -123,6 +125,7 @@ var ThreeCard = (function() {
         } else {
           alert("Player " + this.id + " has won the game.");
           game_started = false;
+          window.location.replace("three-card.html");
         }
       }
     }
@@ -130,6 +133,7 @@ var ThreeCard = (function() {
       this.hand = this.hand.filter(val => val !== card);
       disc.push(card);
       $("#deck").append("<img class='deck_cards' src='images/" + card + ".svg' alt='" + card + "'>");
+      this.draw();
       if (ThreeCard.check_back()){
         four_kind = true;
         garbage.push(disc);
@@ -138,8 +142,12 @@ var ThreeCard = (function() {
         $("#deck").empty();
         $("#deck").append("<img src='images/deck.svg' alt='deck'>");
         Banners.display_ten();
+        //this.draw();
         return -1;
       }
+      //Make separate function to write to previous. Make it more descriptive
+      $("#previous").prepend("<p>Player " + (this.id + 1) + " - " + card + "</p>");
+      //this.draw();
     }
     this.pick = async function() {
       for (var i = 1; i < disc.length; i += 1) {
@@ -147,6 +155,7 @@ var ThreeCard = (function() {
       }
       disc = [];
       disc.push(-1);
+      $("#previous").prepend("<p>Player " + (this.id + 1) + " picked up</p>");
       $("#deck").empty();
       $("#deck").append("<img src='images/deck.svg' alt='deck'>");
     }
@@ -286,6 +295,7 @@ pub.comp_play = async function(id) {
     }
     return false;
   }
+  return false;
 }
 return pub;
 })();

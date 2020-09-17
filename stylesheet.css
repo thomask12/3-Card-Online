@@ -1,4 +1,10 @@
 /* Color Theme Swatches in Hex */
+.bronze-and-grey-blues-1-hex { color: #324371; }
+.bronze-and-grey-blues-2-hex { color: #435D74; }
+.bronze-and-grey-blues-3-hex { color: #5194BE; }
+.bronze-and-grey-blues-4-hex { color: #BF756A; }
+.bronze-and-grey-blues-5-hex { color: #878785; }
+
 .Better-Odds-Than-Vegas-1-hex { color: #FED26F; }
 .Better-Odds-Than-Vegas-2-hex { color: #FBB03B; }
 .Better-Odds-Than-Vegas-3-hex { color: #F9FAFB; }
@@ -6,12 +12,66 @@
 .Better-Odds-Than-Vegas-5-hex { color: #ED1C24; }
 
 body{
+  font-family: harfang-pro,serif;
+  font-weight: 900;
+  font-style: normal;
   background-color: #FBB03B;
-  color: #F9FAFB;
-  font-size: 30px;
+  color: #000000;
+  font-size: 20px;
   padding: 20px;
-  width: 50%;
-  margin: auto;
+  width: auto;
+  margin: 20px 50px 20px 50px;
+}
+
+/*Other text Color
+color: #435D74;
+*/
+
+h2{
+  text-decoration: underline;
+}
+
+img{
+  width: 75px;
+  height: 100px;
+}
+
+header h1{
+  text-align: center;
+}
+
+dd{
+  margin-left: 75px;
+}
+
+hr{
+  height: 2px;
+  width: 100%;
+  background-color: #435D74;
+  border: none;
+}
+
+dd img{
+  height: 60px;
+  width: auto;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+dd ul{
+  list-style-type: none;
+  display: block;
+}
+
+dd li{
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.subtitle{
+  margin-left: 50px;
+  margin-bottom: 10px;
+  text-decoration: underline;
 }
 
 .top-menu{
@@ -37,13 +97,8 @@ body{
   color: #F9FAFB;
 }
 
-img{
-  width: 75px;
-  height: 100px;
-}
-
 #deck{
-
+  display: inline;
   height: 20%;
   width: 55%;
   justify-content: center;
@@ -124,14 +179,40 @@ img{
 }
 
 #alerts{
-  position: absolute;
+  visibility: hidden;
   text-align: center;
-  width: 48%;
-  top: 45%;
+  width: 70%;
   padding: 15px;
   opacity: 0.85;
   border: 1px solid transparent;
   color: #0F1026;
   background-color: #0979BF;
   border-radius: 2px;
+  position: fixed;
+  z-index: 1;
+  top: 45%;
+}
+
+#previous{
+  position: relative;
+  display: inline;
+  float: left;
+  height: 100px;
+  width: 15%;
+  display: inline-block;
+  overflow-y: auto;
+  background-color: #FAF7EE;
+  border-width: 2px;
+  border-style: solid;
+  border-color: #000000;
+  color: #000000;
+}
+
+#previous p{
+  padding-left: 10px;
+  font-size: 12px;
+}
+
+.game_rules ul{
+  list-style-type: circle;
 }
