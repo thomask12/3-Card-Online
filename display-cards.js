@@ -29,6 +29,15 @@ $(document).ready(async function() {
         $("#cards").append("<div id='card_wrapper'><img class='user_cards' src='images/" + players[0].hand[i] + ".svg' alt='" + players[0].hand[i] + "'></div>");
       }
     }
+    //Need to remove deck card once a card is played
+    /*
+    Display number of cards in opponent's hand (face down)
+    for (var j = 1; j < players.length; j += 1){
+      for (var k = 0; k < players[j].hand.length; k += 1){
+        $("#opponent" + j).prepend()
+      }
+    }
+    */
   }
   newCards();
   $("#deck").css("display", "flex");

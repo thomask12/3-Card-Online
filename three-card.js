@@ -132,7 +132,7 @@ var ThreeCard = (function() {
     this.put = async function(card) {
       this.hand = this.hand.filter(val => val !== card);
       disc.push(card);
-      $("#deck").append("<img class='deck_cards' src='images/" + card + ".svg' alt='" + card + "'>");
+      $("#deck").append("<div id=deck_wrapper><img class='deck_cards' src='images/" + card + ".svg' alt='" + card + "'></div>");
       this.draw();
       if (ThreeCard.check_back()){
         four_kind = true;
