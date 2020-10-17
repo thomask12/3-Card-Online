@@ -146,7 +146,7 @@ var ThreeCard = (function() {
         return -1;
       }
       //Make separate function to write to previous. Make it more descriptive
-      $("#previous").prepend("<p>Player " + (this.id + 1) + " - " + card + "</p>");
+      $(".prevwrap").prepend("<p>Player " + (this.id + 1) + " - " + card + "</p>");
       //this.draw();
     }
     this.pick = async function() {
@@ -155,7 +155,7 @@ var ThreeCard = (function() {
       }
       disc = [];
       disc.push(-1);
-      $("#previous").prepend("<p>Player " + (this.id + 1) + " picked up</p>");
+      $("#prevwrap").prepend("<p>Player " + (this.id + 1) + " picked up</p>");
       $("#deck").empty();
       $("#deck").append("<img src='images/deck.svg' alt='deck'>");
     }

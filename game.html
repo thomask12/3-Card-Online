@@ -12,24 +12,29 @@
 </head>
 
 <body>
-  <div id="opponent">
-  </div>
-  <div id="alerts"></div>
-  <div id="previous"></div>
-  <div id="deck"><img src="images/deck.svg"></div>
-  <div id="user">
-    <div id="top">
-      <img class="top1" src="images/deck.svg" alt="deck">
-      <img class="top2" src="images/deck.svg" alt="deck">
-      <img class="top3" src="images/deck.svg" alt="deck">
+  <div class="grid_container">
+    <div id="opponent"> <!--Grid item "header"-->
     </div>
-    <div id="cards">
+    <div id="alerts"></div>
+    <div id="previous">
+      <div class="prevwrap"></div>
+    </div> <!--Grid item "sidebar"-->
+    <div id="deck"><img src="images/deck.svg"></div> <!--Grid item "main"-->
+    <div id="rem_cards"></div> <!--Grid item "remcards"-->
+    <div id="user"> <!--Grid item "footer"-->
+      <div id="top">
+        <img class="top1" src="images/deck.svg" alt="deck">
+        <img class="top2" src="images/deck.svg" alt="deck">
+        <img class="top3" src="images/deck.svg" alt="deck">
+      </div>
+      <div id="cards">
+      </div>
     </div>
-  </div>
-  <div class="start-menu">
-    <form id="begin-game">
-      <button type="submit">Begin Game</button>
-    </form>
+    <div class="start-menu">
+      <form id="begin-game">
+        <button type="submit">Begin Game</button>
+      </form>
+    </div>
   </div>
 </body>
 
