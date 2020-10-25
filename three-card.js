@@ -31,6 +31,17 @@ var ThreeCard = (function() {
     this.to_play = [];
     //Makes strings for APICards
     //Finds the lowest card in a players hand
+    this.orderHand = function(){
+      this.hand.sort(function(x, y){
+        if(ThreeCard.card_value(x) < ThreeCard.card_value(y)){
+          return -1;
+        }
+        if(ThreeCard.card_value(x) > ThreeCard.card_value(y)){
+          return 1;
+        }
+        return 0;
+      });
+    }
     this.lowestCard = function() {
       var lowest = 100;
       var lowest_card;
@@ -95,14 +106,14 @@ var ThreeCard = (function() {
           this.top = [];
           if (this.id === 0) {
             $("#top").empty();
-            $("#top").append("<img class='top1' src='images/deck.svg' alt='deck'>" +
-              "<img class='top2' src='images/deck.svg' alt='deck'>" +
-              "<img class='top3' src='images/deck.svg' alt='deck'>");
+            $("#top").append("<img class='top1' src='images/deck_01.svg' alt='deck'>" +
+              "<img class='top2' src='images/deck_01.svg' alt='deck'>" +
+              "<img class='top3' src='images/deck_01.svg' alt='deck'>");
           } else {
             $("#op" + this.id + "top").empty();
-            $("#op" + this.id + "top").append("<img class='op" + i + "top1' src='images/deck.svg' alt='deck'>" +
-              "<img class='op" + i + "top2' src='images/deck.svg' alt='deck'>" +
-              "<img class='op" + i + "top3' src='images/deck.svg' alt='deck'>");
+            $("#op" + this.id + "top").append("<img class='op" + i + "top1' src='images/deck_01.svg' alt='deck'>" +
+              "<img class='op" + i + "top2' src='images/deck_01.svg' alt='deck'>" +
+              "<img class='op" + i + "top3' src='images/deck_01.svg' alt='deck'>");
           }
         } else if (this.bottom.length !== 0) {
           //Removes first value of the array
@@ -111,14 +122,14 @@ var ThreeCard = (function() {
           if (this.id === 0) {
             $("#top").empty();
             for (var i = 0; i < this.bottom.length; i += 1) {
-              $("#top").append("<img class='unknown" + i + "' src='images/deck.svg' alt='unknown" + i + "'>");
+              $("#top").append("<img class='unknown" + i + "' src='images/deck_01.svg' alt='unknown" + i + "'>");
             }
-            $("#cards").append("<img class='user_cards' src='images/deck.svg' alt='unknown'>");
+            $("#cards").append("<img class='user_cards' src='images/deck_01.svg' alt='unknown'>");
             this.hand.push("unknown");
           } else {
             $("#op" + this.id + "top").empty();
             for (var i = 0; i < this.bottom.length; i += 1) {
-              $("#op" + this.id + "top").append("<img class='unknown" + i + "' src='images/deck.svg' alt='unknown" + i + "'>");
+              $("#op" + this.id + "top").append("<img class='unknown" + i + "' src='images/deck_01.svg' alt='unknown" + i + "'>");
             }
           }
 
@@ -128,20 +139,31 @@ var ThreeCard = (function() {
           window.location.replace("three-card.html");
         }
       }
+      if(draw_deck.length === 26){
+        $("#rem_cards").empty();
+        $("#rem_cards").append("<img src='images/deck_01_02.png'>");
+      }
+      if(draw_deck.length === 10){
+        $("#rem_cards").empty();
+        $("#rem_cards").append("<img src='images/deck_01.svg'>");
+      }
+      if(draw_deck.length === 0){
+        $("#rem_cards").empty();
+      }
     }
     this.put = async function(card) {
       this.hand = this.hand.filter(val => val !== card);
       disc.push(card);
       $("#deck").append("<div id=deck_wrapper><img class='deck_cards' src='images/" + card + ".svg' alt='" + card + "'></div>");
       this.draw();
-      if (ThreeCard.check_back()){
+      if (ThreeCard.check_back() && this.id === 0){
         four_kind = true;
         garbage.push(disc);
         disc = [];
         disc.push(-1);
         $("#deck").empty();
-        $("#deck").append("<img src='images/deck.svg' alt='deck'>");
-        Banners.display_ten();
+        //$("#deck").append("<img src='images/deck_01.svg' alt='deck'>");
+        await Banners.display_ten();
         //this.draw();
         return -1;
       }
@@ -155,9 +177,9 @@ var ThreeCard = (function() {
       }
       disc = [];
       disc.push(-1);
-      $("#prevwrap").prepend("<p>Player " + (this.id + 1) + " picked up</p>");
+      $(".prevwrap").prepend("<p>Player " + (this.id + 1) + " picked up</p>");
       $("#deck").empty();
-      $("#deck").append("<img src='images/deck.svg' alt='deck'>");
+      //$("#deck").append("<img src='images/deck_01.svg' alt='deck'>");
     }
   }
   pub.card_value = function(card) {
@@ -253,18 +275,18 @@ pub.user_play = async function(card, imag){
   }
   //Makes player select again if they picked a card too low
   else {
-    Banners.display_wrong_card();
+    await Banners.display_wrong_card();
     return -1;
   }
 }
 pub.comp_play = async function(id) {
   await players[id].lowestPlayable();
   if (players[id].low === -1) {
-    Banners.display_pickup(id);
+    await Banners.display_pickup(id);
     players[id].pick();
   } else if (ThreeCard.card_value(players[id].low[0]) === 15) {
     await timeout(650);
-    Banners.display_two();
+    await Banners.display_two();
     await players[id].put(players[id].low[0]);
     await players[id].draw();
     await ThreeCard.comp_play(id);
@@ -273,7 +295,7 @@ pub.comp_play = async function(id) {
     await Banners.display_ten();
     await players[id].put(players[id].low[0]);
     $("#deck").empty();
-    $("#deck").append("<img src='images/deck.svg' alt='deck'>");
+    //$("#deck").append("<img src='images/deck_01.svg' alt='deck'>");
     disc = [];
     disc.push(-1);
     await players[id].draw();
@@ -289,8 +311,10 @@ pub.comp_play = async function(id) {
       garbage.push(disc);
       disc = [];
       disc.push(-1);
-      Banners.display_ten();
-      alert("Computer played four of a kind");
+      $("#deck").empty();
+      //alert("Computer plays again");
+      await Banners.display_ten();
+      //alert("Computer played four of a kind");
       await ThreeCard.comp_play(id);
     }
     return false;

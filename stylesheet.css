@@ -27,21 +27,31 @@ body{
   justify-content: center;
   display: grid;
   grid-template-columns: 15% 50% 15%;
-  grid-template-rows: auto;
+  grid-template-rows: 30vh 15vh 38vh 5vh;
   grid-template-areas:
   "header header header"
   "sidebar main remcards"
   "footer footer footer"
   "bttn bttn bttn";
-  min-height: 0;
-  min-width: 0;
+  grid-gap: 10px;
 }
 
 /*Other text Color
 color: #435D74;
 */
 
-h2{
+.example{
+  display: inline-block;
+  margin-left: 5px;
+  margin-right: 5px;
+  width: 75px;
+  height: 20px;
+  border-style: dashed;
+  border-radius: 5px;
+  border-width: 2px;
+}
+
+.top_menu h2{
   text-decoration: underline;
 }
 
@@ -115,15 +125,33 @@ dd li{
 
 #rem_cards{
   grid-area: remcards;
+  justify-content: center;
+}
+
+#rem_cards img{
+  height: 100px;
+  width: auto;
 }
 
 #deck{
   grid-area: main;
-  display: inline-block;
-  justify-self: center;
+  border-style: dashed;
+  border-color: #FBB03B;
+  border-width: 2px;
+  border-radius: 5px;
+  display: block;
+  justify-self: stretch;
   margin-top: 5px;
   margin-bottom: 5px;
+  max-height: 16vh;
 }
+
+#deck img{
+  height: 95px;
+  width: auto;
+  padding: 2px;
+}
+
 .deck_cards{
   display: flex;
   flex-direction: column;
@@ -133,6 +161,10 @@ dd li{
 
 #deck_wrapper{
   overflow: hidden;
+}
+
+#deck_wrapper:last-child{
+  overflow: visible;
 }
 
 #top, #op1top, #op2top, #op3top{
@@ -149,18 +181,20 @@ dd li{
   border-width: 7px;
   border-radius: 3px;
   border-color: #FED26F;
-  margin-bottom: 5px;
+  /*margin-bottom: 5px;*/
   background-color: #000000;
+  max-height: 35vh;
 }
 #opponent1, #opponent2, #opponent3{
   display: block;
   justify-content: center;
   text-align: center;
-  margin: 20px;
+  /*margin: 20px;*/
 }
 
 #user{
   grid-area: footer;
+  max-height: 42vh;
   position: relative;
   border-style: solid;
   border-width: 7px;
@@ -173,6 +207,8 @@ dd li{
   align-content: center;
   justify-content: center;
   margin: 15px;
+  padding-left: 20vh;
+  padding-right: 20vh;
 }
 .user_cards{
   display: flex;
@@ -209,7 +245,7 @@ dd li{
   padding: 15px;
   margin-top: auto;
   margin-bottom: auto;
-  opacity: 0.85;
+  opacity: 0.95;
   border: 1px solid transparent;
   color: #0F1026;
   background-color: #0979BF;
@@ -221,19 +257,21 @@ dd li{
   grid-area: sidebar;
   position: relative;
   justify-self: stretch;
-  display: inline-block;
+  display: flex;
+  flex-flow: column;
   background-color: #FAF7EE;
-  border-width: 2px;
-  border-style: solid;
-  border-color: #000000;
   color: #000000;
   margin-bottom: 5px;
+  margin-right: 5px;
+  border-style: solid;
+  border-color: #000000;
+  border-width: 2px;
 }
 
 #previous p{
   padding-left: 10px;
-  padding-bottom: 1px;
-  font-size: 13px;
+  margin-bottom: 1px;
+  font-size: 10px;
 }
 
 .prevwrap{

@@ -21,23 +21,15 @@ $(document).ready(async function() {
   }
   async function newCards() {
     $("#cards").empty();
+    players[0].orderHand();
     for (var i = 0; i < players[0].hand.length; i += 1) {
       if (players[0].hand[1] === "unknown") {
         players[0].hand.pop();
-        $("#cards").append("<img class='user_cards' src='images/deck.svg' alt='unknown'>");
+        $("#cards").append("<img class='user_cards' src='images/deck_01.svg' alt='unknown'>");
       } else {
         $("#cards").append("<div id='card_wrapper'><img class='user_cards' src='images/" + players[0].hand[i] + ".svg' alt='" + players[0].hand[i] + "'></div>");
       }
     }
-    //Need to remove deck card once a card is played
-    /*
-    Display number of cards in opponent's hand (face down)
-    for (var j = 1; j < players.length; j += 1){
-      for (var k = 0; k < players[j].hand.length; k += 1){
-        $("#opponent" + j).prepend()
-      }
-    }
-    */
   }
   newCards();
   $("#deck").css("display", "flex");
@@ -51,9 +43,9 @@ $(document).ready(async function() {
   async function displayOpponents(n) {
     for (var i = 1; i <= n; i += 1) {
       $("#opponent").append("<div id='opponent" + i + "'><h4>Opponent " + i + "</h4>" +
-        "<div id='op" + i + "top'><img class='op" + i + "top1' src='images/deck.svg' alt='deck'>" +
-        "<img class='op" + i + "top2' src='images/deck.svg' alt='deck'>" +
-        "<img class='op" + i + "top3' src='images/deck.svg' alt='deck'>" +
+        "<div id='op" + i + "top'><img class='op" + i + "top1' src='images/deck_01.svg' alt='deck'>" +
+        "<img class='op" + i + "top2' src='images/deck_01.svg' alt='deck'>" +
+        "<img class='op" + i + "top3' src='images/deck_01.svg' alt='deck'>" +
         "</div></div>");
       await ThreeCard.findTops(i);
     }
@@ -77,7 +69,7 @@ $(document).ready(async function() {
         var temp = players[0].top.filter(val => val !== this_value);
         players[0].top = temp;
         players[0].hand.push(this_value);
-        $(e).attr("src", "images/deck.svg");
+        $(e).attr("src", "images/deck_01.svg");
         $(e).attr("alt", "deck");
         newCards();
       }
@@ -98,22 +90,24 @@ $(document).ready(async function() {
   });
   //Activate after player has selected cards
   $("#deck").on("click", async function() {
+    $("#deck").css("border-color", "#FBB03B");
     //Checks if a player needs to pick up cards
     if (user_pickup) {
       user_pickup = false;
       players[0].pick();
+      await Banners.display_pickup(0);
       newCards();
     }
     //Checks is player selected cards before trying to play
     else if (players[0].to_play.length === 0) {
-      Banners.display_wrong();
+      await Banners.display_wrong();
       return false;
     }
     else if (players[0].to_play.length > 0) {
       //Allows a player to play again after a 2 (reset card)
       if (ThreeCard.card_value(players[0].to_play[0]) === 15) {
         players[0].put(players[0].to_play[0]);
-        Banners.display_two();
+        await Banners.display_two();
         newCards();
         players[0].to_play = [];
         return false;
@@ -125,8 +119,7 @@ $(document).ready(async function() {
         disc = [];
         disc.push(-1);
         $("#deck").empty();
-        $("#deck").append("<img src='images/deck.svg' alt='deck'>");
-        Banners.display_ten();
+        await Banners.display_ten();
         newCards();
         players[0].to_play = [];
         return false;
@@ -178,6 +171,7 @@ $(document).ready(async function() {
     }
     //Game starts
     else {
+      $("#deck").css("border-color", "#000000");
       //this_value is card code
       //players[...].low should have EVERY cards with the same value as the lowest card
       //Need to figure out displaying cards if there's a botto card in a player's hand
@@ -190,11 +184,13 @@ $(document).ready(async function() {
         user_pickup = false;
         newCards();
         computers_play();
+        $("#deck").css("border-color", "#FBB03B");
         return false;
       }
       //Checks if a player selected a card with a large enough value
       else if (ThreeCard.card_value(this_value) < ThreeCard.card_value(players[0].low) && ThreeCard.card_value(players[0].low) !== 15) {
-        Banners.display_wrong_card();
+        await Banners.display_wrong_card();
+        $("#deck").css("border-color", "#FBB03B");
         return false;
       }
       if (players[0].to_play.length > 0) {
@@ -204,6 +200,7 @@ $(document).ready(async function() {
           $("img[alt='" + players[0].to_play[0] + "']").parent().css("transform", "translate(0px, 0px)");
           $("img[alt='" + players[0].to_play[0] + "']").parent().css("overflow", "hidden");
           players[0].to_play = [];
+          $("#deck").css("border-color", "#FBB03B");
           return false;
         }
         //Deselects cards if a different value is clicked
@@ -214,6 +211,7 @@ $(document).ready(async function() {
             $("img[alt='" + players[0].to_play[i] + "']").parent().css("overflow", "hidden");
           }
           players[0].to_play = [];
+          $("#deck").css("border-color", "#FBB03B");
           return false;
         }
         //Deselects one card if multiple are selected
@@ -239,9 +237,9 @@ $(document).ready(async function() {
       }
       if (this_value === "unknown") {
         var botm_card = players[0].hand[0];
-        user_result = await ThreeCard.user_play(botm_card, "images/" + botm_card + ".svg");
+        user_result = ThreeCard.user_play(botm_card, "images/" + botm_card + ".svg");
       } else {
-        user_result = await ThreeCard.user_play(this_value, this_img);
+        user_result = ThreeCard.user_play(this_value, this_img);
       }
       return false;
     }
