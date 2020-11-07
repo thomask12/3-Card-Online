@@ -30,6 +30,30 @@ $(document).ready(async function() {
         $("#cards").append("<div id='card_wrapper'><img class='user_cards' src='images/" + players[0].hand[i] + ".svg' alt='" + players[0].hand[i] + "'></div>");
       }
     }
+    //Find a way to display opponents cards
+    /*
+    for(var i = 1; i < players.length; i += 1){
+      if (players[i].hand.length === 3){
+        $(".ophand" + i + "").empty();
+        $(".ophand" + i + "").append("<img src='images/deck_01_03.png'>");
+      }
+      if (players[i].hand.length === 4){
+        $(".ophand" + i + "").empty();
+        $(".ophand" + i + "").append("<img src='images/deck_01_04.png'>");
+      }
+      if (players[i].hand.length === 5){
+        $(".ophand" + i + "").empty();
+        $(".ophand" + i + "").append("<img src='images/deck_01_05.png'>");
+      }
+      if (players[i].hand.length === 6){
+        $(".ophand" + i + "").empty();
+        $(".ophand" + i + "").append("<img src='images/deck_01_06.png'>");
+      }
+      if (players[i].hand.length > 6){
+        $(".ophand" + i + "").empty();
+        $(".ophand" + i + "").append("<img src='images/deck_01_06plus.png'>");
+      }
+    }*/
   }
   newCards();
   $("#deck").css("display", "flex");
@@ -42,7 +66,8 @@ $(document).ready(async function() {
   //Displays computer players and their initial face down cards
   async function displayOpponents(n) {
     for (var i = 1; i <= n; i += 1) {
-      $("#opponent").append("<div id='opponent" + i + "'><h4>Opponent " + i + "</h4>" +
+      $("#opponent").append("<div id='opponent" + i + "'><h4>Opponent " + (i + 1) + "</h4>" +
+        "<div class='ophand" + i + "'><img src='images/deck_01_06.png'></div>" +
         "<div id='op" + i + "top'><img class='op" + i + "top1' src='images/deck_01.svg' alt='deck'>" +
         "<img class='op" + i + "top2' src='images/deck_01.svg' alt='deck'>" +
         "<img class='op" + i + "top3' src='images/deck_01.svg' alt='deck'>" +
