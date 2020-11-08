@@ -30,30 +30,12 @@ $(document).ready(async function() {
         $("#cards").append("<div id='card_wrapper'><img class='user_cards' src='images/" + players[0].hand[i] + ".svg' alt='" + players[0].hand[i] + "'></div>");
       }
     }
-    //Find a way to display opponents cards
-    /*
-    for(var i = 1; i < players.length; i += 1){
-      if (players[i].hand.length === 3){
-        $(".ophand" + i + "").empty();
-        $(".ophand" + i + "").append("<img src='images/deck_01_03.png'>");
+    for (var i = 1; i < players.length; i += 1){
+      $(".ophand" + i + "").empty();
+      for (var j = 0; j < players[i].hand.length; j += 1){
+        $(".ophand" + i + "").append("<div id='ophandwrap'><img src='images/deck_01.svg'></div>");
       }
-      if (players[i].hand.length === 4){
-        $(".ophand" + i + "").empty();
-        $(".ophand" + i + "").append("<img src='images/deck_01_04.png'>");
-      }
-      if (players[i].hand.length === 5){
-        $(".ophand" + i + "").empty();
-        $(".ophand" + i + "").append("<img src='images/deck_01_05.png'>");
-      }
-      if (players[i].hand.length === 6){
-        $(".ophand" + i + "").empty();
-        $(".ophand" + i + "").append("<img src='images/deck_01_06.png'>");
-      }
-      if (players[i].hand.length > 6){
-        $(".ophand" + i + "").empty();
-        $(".ophand" + i + "").append("<img src='images/deck_01_06plus.png'>");
-      }
-    }*/
+    }
   }
   newCards();
   $("#deck").css("display", "flex");
@@ -67,7 +49,7 @@ $(document).ready(async function() {
   async function displayOpponents(n) {
     for (var i = 1; i <= n; i += 1) {
       $("#opponent").append("<div id='opponent" + i + "'><h4>Opponent " + (i + 1) + "</h4>" +
-        "<div class='ophand" + i + "'><img src='images/deck_01_06.png'></div>" +
+        "<div class='ophand" + i + "'></div>" +
         "<div id='op" + i + "top'><img class='op" + i + "top1' src='images/deck_01.svg' alt='deck'>" +
         "<img class='op" + i + "top2' src='images/deck_01.svg' alt='deck'>" +
         "<img class='op" + i + "top3' src='images/deck_01.svg' alt='deck'>" +
@@ -100,7 +82,6 @@ $(document).ready(async function() {
       }
     }
   }
-  //
   //Removes card from top if there is one already selected
   $("#top").on("click", ".top1", function() { selectTops(this); });
   $("#top").on("click", ".top2", function() { selectTops(this); });
@@ -162,7 +143,8 @@ $(document).ready(async function() {
       }
       newCards();
     }
-    computers_play();
+    await computers_play();
+    await newCards();
     players[0].to_play = [];
     return false;
   });
@@ -197,12 +179,8 @@ $(document).ready(async function() {
     //Game starts
     else {
       $("#deck").css("border-color", "#000000");
-      //this_value is card code
       //players[...].low should have EVERY cards with the same value as the lowest card
       //Need to figure out displaying cards if there's a botto card in a player's hand
-      //if(disc.length === 1){
-      //$("#deck").empty();
-      //}
       //Allows user to pick up by clicking their hand
       if(user_pickup){
         players[0].pick();

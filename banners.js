@@ -36,6 +36,7 @@ var Banners = (function(){
     $("#alerts").css("background-color", "#0979BF");
   }
   pub.beast = function(){
+    $("#alerts").css("visibility", "visible");
     $("#alerts").css("background-color", "black");
     $("#alerts").css("color", "red")
     $("#alerts").html("666 The Number of the Beast 666");

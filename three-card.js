@@ -162,14 +162,10 @@ var ThreeCard = (function() {
         disc = [];
         disc.push(-1);
         $("#deck").empty();
-        //$("#deck").append("<img src='images/deck_01.svg' alt='deck'>");
         await Banners.display_ten();
-        //this.draw();
         return -1;
       }
-      //Make separate function to write to previous. Make it more descriptive
       $(".prevwrap").prepend("<p>Player " + (this.id + 1) + " - " + card + "</p>");
-      //this.draw();
     }
     this.pick = async function() {
       for (var i = 1; i < disc.length; i += 1) {
@@ -179,7 +175,6 @@ var ThreeCard = (function() {
       disc.push(-1);
       $(".prevwrap").prepend("<p>Player " + (this.id + 1) + " picked up</p>");
       $("#deck").empty();
-      //$("#deck").append("<img src='images/deck_01.svg' alt='deck'>");
     }
   }
   pub.card_value = function(card) {
@@ -264,8 +259,6 @@ pub.user_play = async function(card, imag){
   //if user_play returns -1 return false and break the loop
   await players[0].lowestPlayable();
   if ((players[0].low) === -1) {
-    //Alert on screen to pick up cards
-    //user_pickup = true;
     return 0;
   }
   //Puts card down and draws if it is greater than the lowest playable
@@ -283,7 +276,13 @@ pub.comp_play = async function(id) {
   await players[id].lowestPlayable();
   if (players[id].low === -1) {
     await Banners.display_pickup(id);
-    players[id].pick();
+    await players[id].pick();
+    for (var i = 1; i < players.length; i += 1){
+      $(".ophand" + i + "").empty();
+      for (var j = 0; j < players[i].hand.length; j += 1){
+        $(".ophand" + i + "").append("<div id='ophandwrap'><img src='images/deck_01.svg'></div>");
+      }
+    }
   } else if (ThreeCard.card_value(players[id].low[0]) === 15) {
     await timeout(650);
     await Banners.display_two();
@@ -295,7 +294,6 @@ pub.comp_play = async function(id) {
     await Banners.display_ten();
     await players[id].put(players[id].low[0]);
     $("#deck").empty();
-    //$("#deck").append("<img src='images/deck_01.svg' alt='deck'>");
     disc = [];
     disc.push(-1);
     await players[id].draw();
@@ -312,9 +310,7 @@ pub.comp_play = async function(id) {
       disc = [];
       disc.push(-1);
       $("#deck").empty();
-      //alert("Computer plays again");
       await Banners.display_ten();
-      //alert("Computer played four of a kind");
       await ThreeCard.comp_play(id);
     }
     return false;

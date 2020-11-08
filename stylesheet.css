@@ -11,6 +11,7 @@
 .Better-Odds-Than-Vegas-4-hex { color: #0979BF; }
 .Better-Odds-Than-Vegas-5-hex { color: #ED1C24; }
 
+/* General display settings */
 body{
   font-family: harfang-pro,serif;
   font-weight: 900;
@@ -27,19 +28,29 @@ body{
   justify-content: center;
   display: grid;
   grid-template-columns: 15% 50% 15%;
-  grid-template-rows: 35vh 15vh 38vh 5vh;
+  grid-template-rows: 38vh 14vh 35vh 1vh;
   grid-template-areas:
   "header header header"
   "sidebar main remcards"
   "footer footer footer"
   "bttn bttn bttn";
-  grid-gap: 10px;
+  grid-gap: 2px;
 }
 
 /*Other text Color
 color: #435D74;
 */
 
+img{
+  width: 75px;
+  height: 100px;
+}
+
+header h1{
+  text-align: center;
+}
+
+/* Handles home page instructions */
 .example{
   display: inline-block;
   margin-left: 5px;
@@ -55,39 +66,23 @@ color: #435D74;
   text-decoration: underline;
 }
 
-img{
-  width: 75px;
-  height: 100px;
-}
-
-header h1{
-  text-align: center;
-}
-
-dd{
+.instructions dd{
   margin-left: 75px;
 }
 
-hr{
-  height: 2px;
-  width: 100%;
-  background-color: #435D74;
-  border: none;
-}
-
-dd img{
+.instructions dd img{
   height: 60px;
   width: auto;
   display: inline-block;
   vertical-align: middle;
 }
 
-dd ul{
+.instructions dd ul{
   list-style-type: none;
   display: block;
 }
 
-dd li{
+.instructions dd li{
   font-size: 20px;
   margin-bottom: 10px;
 }
@@ -98,6 +93,7 @@ dd li{
   text-decoration: underline;
 }
 
+/* Handles start menu button */
 .top-menu{
   text-align: center;
   padding: 5px;
@@ -109,6 +105,7 @@ dd li{
   color: #F9FAFB;
 }
 
+/* Handles the start button */
 .start-menu{
   grid-area: bttn;
   justify-content: center;
@@ -123,6 +120,7 @@ dd li{
   color: #F9FAFB;
 }
 
+/* Handles the amount of cards remaining in the deck */
 #rem_cards{
   grid-area: remcards;
   justify-content: center;
@@ -133,6 +131,7 @@ dd li{
   width: auto;
 }
 
+/* Handles deck area */
 #deck{
   grid-area: main;
   border-style: dashed;
@@ -141,11 +140,10 @@ dd li{
   border-radius: 5px;
   display: block;
   justify-self: stretch;
-  margin-top: 5px;
-  margin-bottom: 5px;
-  max-height: 16vh;
+  max-height: 14vh;
 }
 
+/* Handle's deck card images */
 #deck img{
   height: 95px;
   width: auto;
@@ -167,13 +165,7 @@ dd li{
   overflow: visible;
 }
 
-#top, #op1top, #op2top, #op3top{
-  display: flex;
-  justify-content: center;
-  text-align: center;
-  margin: 25px;
-}
-
+/* Handle's opponent's area */
 #opponent{
   grid-area: header;
   color: #FFFFFF;
@@ -183,33 +175,65 @@ dd li{
   border-width: 7px;
   border-radius: 3px;
   border-color: #FED26F;
-  /*margin-bottom: 5px;*/
   background-color: #000000;
-  max-height: 35vh;
+  max-height: 36vh;
+}
+
+#opponent1, #opponent2, #opponent3{
+  display: inline-block;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Handles opponent's hand */
+#op1top, #op2top, #op3top{
+  display: flex;
+  justify-content: center;
+  text-align: center;
 }
 
 #opponent img{
-  height: 75px;
+  height: 90px;
   margin-left: 5px;
   margin-right: 5px;
   width: auto;
 }
-#opponent1, #opponent2, #opponent3{
-  display: block;
+
+.ophand1, .ophand2, .ophand3{
+  margin-top: 5px;
+  display: flex;
+  align-content: center;
   justify-content: center;
-  text-align: center;
-  margin-top: 0px;
-  /*margin: 20px;*/
+  padding-left: 100px;
+  padding-right: 100px;
 }
 
+.ophand1 img, .ophand2 img, .ophand3 img{
+  height: 50px;
+  width: auto;
+}
+
+#ophandwrap{
+  overflow: hidden;
+}
+
+/* Handles user's area */
 #user{
   grid-area: footer;
-  max-height: 42vh;
+  max-height: 32vh;
   position: relative;
   border-style: solid;
   border-width: 7px;
   border-color: #ED1C24;
   background-color: #000000;
+}
+
+/* Handles user's hand */
+#top{
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  text-align: center;
 }
 
 #cards{
@@ -243,12 +267,7 @@ dd li{
   transform: scale(1.2);
 }
 
-.ophand1 img, .ophand2 img, .ophand3 img{
-  height: 50px;
-  width: auto;
-  margin-top: 0px;
-}
-
+/* Handles the different alerts that pop up throughout the game */
 #alerts{
   grid-area: main;
   position: relative;
@@ -269,6 +288,7 @@ dd li{
   z-index: 1;
 }
 
+/* Handles display of previous cards played */
 #previous{
   grid-area: sidebar;
   position: relative;
@@ -291,7 +311,7 @@ dd li{
 }
 
 .prevwrap{
-  max-height: 13vh;
+  max-height: 10vh;
   overflow-y: hidden;
 }
 
